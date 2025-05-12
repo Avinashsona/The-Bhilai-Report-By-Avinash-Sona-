@@ -1,1 +1,8 @@
-$ mkdir -p GitHub_upload/images
+steel-plant.jpg
+farming.jpg
+shopping-mall.jpg
+cricket-team.jpg
+education.jpg
+water-conservation.jpg
+bhilai-report-logo.svg
+README.md
