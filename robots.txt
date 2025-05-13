@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /wp-admin/
+Disallow: /wp-login.php
+Sitemap: https://avinashsona.github.io/The-Bhilai-Report-By-Avinash-Sona/sitemap.xml
