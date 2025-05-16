@@ -414,7 +414,87 @@
             </div>
         </div>
     </footer>
+<!-- Music Player Section -->
+<section id="music-player" style="background:#121212; color:white; padding:20px 10px; text-align:center; transition: background 0.5s, color 0.5s;">
+  <h2 style="color:#1db954; transition: color 0.5s;">Top Trending Music</h2>
+  <input type="text" id="search" placeholder="गाना ढूंढो..." style="padding:10px; width:80%; max-width:400px; border-radius:20px; border:none; margin-top:15px; background:#222; color:#fff; transition: background 0.5s, color 0.5s;">
+  <div id="playlist" style="max-width:600px; margin:20px auto; overflow-y:auto; max-height:300px;"></div>
+  <button id="toggleMode" style="margin-top:10px; background:#1db954; color:white; padding:10px 20px; border:none; border-radius:25px; cursor:pointer; transition: background 0.3s ease;">Light Mode</button>
+</section>
 
+<script>
+  const songs = [
+    { id: "3hmuxrQCedqBcIrhaDtFfh", title: "Song 1" },
+    { id: "53CBJVudRSYZ5qdNZWpWOS", title: "Song 2" },
+    { id: "6CTxWLiqDhV8gyxqtSoI2j", title: "Song 3" },
+    { id: "0WlsccCnuV4kzlBvXj05oC", title: "Song 4" },
+    { id: "3lALfEfGQ1ufasMwT5222D", title: "Song 5" },
+    { id: "6jJq55CcM6c7Au7idd7J8K", title: "Song 6" },
+    { id: "3WrAgf2BM1KH1AKks5ZTZ1", title: "Song 7" },
+    { id: "1WiGoIW48cWcO5YCMpYKHW", title: "Song 8" },
+    { id: "7A19yqKQvMcshAyxsU3A7R", title: "Song 9" },
+    { id: "68HScSwNebFEe0roM3utOt", title: "Song 10" },
+    { id: "2CRuJjQmUiUDopjLyVGayj", title: "Song 11" },
+    { id: "1gmb05Gsf6NBdbn3an5rNJ", title: "Song 12" },
+  ];
+
+  const container = document.getElementById("playlist");
+  const searchInput = document.getElementById("search");
+  const toggleBtn = document.getElementById("toggleMode");
+  const musicSection = document.getElementById("music-player");
+
+  function renderSongs(filter = "") {
+    container.innerHTML = "";
+    songs
+      .filter(song => song.title.toLowerCase().includes(filter.toLowerCase()))
+      .forEach(song => {
+        const div = document.createElement("div");
+        div.style = `
+          background: ${document.body.classList.contains('light-mode') ? '#e0e0e0' : '#181818'};
+          padding:10px; 
+          margin-bottom:10px; 
+          border-radius:10px; 
+          box-shadow: 0 0 5px ${document.body.classList.contains('light-mode') ? '#aaa' : '#000'};
+          transition: background 0.5s, box-shadow 0.5s;
+        `;
+        div.innerHTML = `
+          <iframe src="https://open.spotify.com/embed/track/${song.id}?utm_source=generator"
+            width="100%" height="80" frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"
+            style="border-radius:12px;"></iframe>`;
+        container.appendChild(div);
+      });
+  }
+
+  searchInput.addEventListener("input", e => renderSongs(e.target.value));
+
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+
+    if(document.body.classList.contains("light-mode")) {
+      musicSection.style.background = "#f9f9f9";
+      musicSection.style.color = "#121212";
+      searchInput.style.background = "#f0f0f0";
+      searchInput.style.color = "#121212";
+      toggleBtn.textContent = "Dark Mode";
+      toggleBtn.style.background = "#1db954";
+      toggleBtn.style.color = "white";
+    } else {
+      musicSection.style.background = "#121212";
+      musicSection.style.color = "white";
+      searchInput.style.background = "#222";
+      searchInput.style.color = "#fff";
+      toggleBtn.textContent = "Light Mode";
+      toggleBtn.style.background = "#1db954";
+      toggleBtn.style.color = "white";
+    }
+
+    renderSongs(searchInput.value);
+  });
+
+  // Initial render
+  renderSongs();
+</script>
     <!-- Back to Top Button -->
     <button id="back-to-top" title="Back to Top"><i class="fas fa-arrow-up"></i></button>
 
