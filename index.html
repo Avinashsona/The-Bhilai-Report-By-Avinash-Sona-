@@ -501,6 +501,110 @@
     <button id="back-to-top" title="Back to Top"><i class="fas fa-arrow-up"></i></button>
 
     <script src="articles.js"></script>
+    <!-- Weather Widget Start -->
+<div class="weather-widget-container">
+  <div class="weather-widget" id="weather-widget">
+    <div class="current-weather">
+      <div class="temp" id="temp">--°C</div>
+      <div class="location" id="location">Bhilai</div>
+      <div class="description" id="description">Loading...</div>
+    </div>
+    <div class="forecast" id="forecast">
+      <!-- Forecast will appear here -->
+    </div>
+  </div>
+</div>
+
+<style>
+.weather-widget-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.weather-widget {
+  background: #1976d2;
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  width: 220px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  font-family: sans-serif;
+}
+
+.weather-widget .temp {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.weather-widget .location {
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.weather-widget .description {
+  font-size: 14px;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.forecast {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.forecast-day {
+  text-align: center;
+}
+</style>
+
+<script>
+const apiKey = "664a79ff30cda77e46362dbc1e11a3e7"; // OpenWeatherMap API Key
+const city = "Bhilai";
+
+async function fetchWeather() {
+  try {
+    const currentRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+    const currentData = await currentRes.json();
+
+    document.getElementById("temp").innerText = `${Math.round(currentData.main.temp)}°C`;
+    document.getElementById("description").innerText = currentData.weather[0].description;
+
+    const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`);
+    const forecastData = await forecastRes.json();
+
+    const forecastDiv = document.getElementById("forecast");
+    forecastDiv.innerHTML = "";
+
+    const daily = forecastData.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 5);
+
+    daily.forEach(day => {
+      const date = new Date(day.dt_txt);
+      const dayName = date.toLocaleDateString("en-IN", { weekday: "short" });
+      const icon = day.weather[0].icon;
+      const temp = Math.round(day.main.temp);
+
+      const dayDiv = document.createElement("div");
+      dayDiv.classList.add("forecast-day");
+      dayDiv.innerHTML = `
+        <div>${dayName}</div>
+        <img src="https://openweathermap.org/img/wn/${icon}@2x.png" width="30" />
+        <div>${temp}°C</div>
+      `;
+      forecastDiv.appendChild(dayDiv);
+    });
+  } catch (error) {
+    console.error("Weather fetch failed:", error);
+    document.getElementById("description").innerText = "Failed to load";
+  }
+}
+
+fetchWeather();
+</script>
+<!-- Weather Widget End -->
     <script src="script.js"></script>
 </body>
 </html>
