@@ -256,7 +256,191 @@
                     </div>
                 </aside>
             </div>
+<!-- Weather Widget -->
+<section id="weather-widget">
+  <div class="weather-container">
+    <div class="weather-header">
+      <div class="weather-icons">
+        <img src="https://openweathermap.org/img/wn/03n@2x.png" alt="cloud" class="icon cloud" />
+        <img src="https://openweathermap.org/img/wn/01n@2x.png" alt="moon" class="icon moon" />
+      </div>
+      <h2><span class="location-icon">📍</span> Bhilai</h2>
+    </div>
+    <div class="weather-info">
+      <div><span class="label">🌡️</span><span id="temperature">--</span>°C</div>
+      <div><span class="label">💧</span><span id="humidity">--</span>%</div>
+      <div><span class="label">💨</span><span id="wind">--</span> km/h</div>
+    </div>
+    <div class="forecast" id="forecast"></div>
+  </div>
+</section>
 
+<style>
+  #weather-widget {
+    background: #3498db; /* light blue */
+    color: #dff3ff;
+    padding: 10px 15px;
+    margin: 30px auto;
+    border-radius: 20px;
+    max-width: 1200px;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .weather-container {
+    text-align: center;
+  }
+  .weather-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .weather-icons {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 70px;
+  }
+  .weather-icons .icon {
+    width: 30px;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+  }
+  .cloud {
+    animation-name: floatCloud;
+  }
+  .moon {
+    margin-left: -15px;
+    animation-name: slowRotate;
+  }
+  @keyframes floatCloud {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes slowRotate {
+    0% { transform: rotate(0deg); opacity: 1; }
+    50% { transform: rotate(10deg); opacity: 0.8; }
+    100% { transform: rotate(0deg); opacity: 1; }
+  }
+  h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .location-icon {
+    font-size: 1.8rem;
+  }
+  .weather-info {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+    font-size: 16px;
+  }
+  .weather-info div {
+    padding: 5px 8px;
+  }
+  .label {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  .forecast {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .forecast-day {
+    background: #1e6fa8;
+    border-radius: 10px;
+    padding: 8px;
+    width: 90px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .forecast-day img {
+    width: 35px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    #weather-widget {
+      padding: 10px;
+      max-width: 100%;
+    }
+    .weather-info {
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .forecast-day {
+      width: 60px;
+      padding: 6px;
+      font-size: 12px;
+    }
+    .forecast-day img {
+      width: 30px;
+    }
+    .weather-icons {
+      width: 50px;
+    }
+    .weather-icons .icon {
+      width: 25px;
+    }
+    h2 {
+      font-size: 1.4rem;
+    }
+    .location-icon {
+      font-size: 1.4rem;
+    }
+  }
+</style>
+
+<script>
+  const apiKey = "664a79ff30cda77e46362dbc1e11a3e7";
+  const city = "Bhilai";
+
+  async function fetchWeather() {
+    try {
+      const currentRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+      const current = await currentRes.json();
+
+      document.getElementById("temperature").textContent = Math.round(current.main.temp);
+      document.getElementById("humidity").textContent = current.main.humidity;
+      document.getElementById("wind").textContent = Math.round(current.wind.speed);
+
+      const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`);
+      const forecastData = await forecastRes.json();
+
+      const forecast = document.getElementById("forecast");
+      forecast.innerHTML = "";
+
+      let dailyData = {};
+      forecastData.list.forEach(item => {
+        const date = item.dt_txt.split(" ")[0];
+        if (!dailyData[date] && Object.keys(dailyData).length < 5) {
+          dailyData[date] = item;
+        }
+      });
+
+      Object.values(dailyData).forEach(day => {
+        const date = new Date(day.dt_txt);
+        const dayName = date.toLocaleDateString('en-IN', { weekday: 'short' });
+        const temp = Math.round(day.main.temp);
+        const icon = day.weather[0].icon;
+        const div = document.createElement("div");
+        div.className = "forecast-day";
+        div.innerHTML = `<strong>${dayName}</strong><br><img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="weather icon"><br>${temp}°C`;
+        forecast.appendChild(div);
+      });
+    } catch (error) {
+      console.error("Weather fetch error:", error);
+    }
+  }
+
+  fetchWeather();
+</script>
             <section class="category-section">
                 <div class="section-header">
                     <h2 class="section-title">भिलाई समाचार</h2>
