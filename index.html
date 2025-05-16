@@ -256,7 +256,127 @@
                     </div>
                 </aside>
             </div>
+<!-- Weather Widget -->
+<section id="weather-widget">
+  <div class="weather-container">
+    <div class="weather-header">
+      <div class="weather-icons">
+        <img src="https://openweathermap.org/img/wn/03n@2x.png" alt="cloud" class="icon" />
+        <img src="https://openweathermap.org/img/wn/01n@2x.png" alt="moon" class="icon moon" />
+      </div>
+      <h2>Bhilai</h2>
+    </div>
+    <div class="weather-info">
+      <div><span class="label">🌡️</span><span id="temperature">--</span>°C</div>
+      <div><span class="label">💧</span><span id="humidity">--</span>%</div>
+      <div><span class="label">💨</span><span id="wind">--</span> km/h</div>
+    </div>
+    <div class="forecast" id="forecast"></div>
+  </div>
+</section>
 
+<style>
+  #weather-widget {
+    background: #0a3d62;
+    color: white;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 20px;
+    max-width: 700px;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .weather-container {
+    text-align: center;
+  }
+  .weather-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .weather-icons {
+    display: flex;
+    align-items: center;
+  }
+  .weather-icons .icon {
+    width: 40px;
+  }
+  .weather-icons .moon {
+    margin-left: -10px;
+  }
+  .weather-info {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    font-size: 20px;
+  }
+  .label {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  .forecast {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .forecast-day {
+    background: #1e6fa8;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100px;
+    text-align: center;
+  }
+  .forecast-day img {
+    width: 40px;
+  }
+</style>
+
+<script>
+  const apiKey = "664a79ff30cda77e46362dbc1e11a3e7";
+  const city = "Bhilai";
+
+  async function fetchWeather() {
+    try {
+      const currentRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+      const current = await currentRes.json();
+
+      document.getElementById("temperature").textContent = Math.round(current.main.temp);
+      document.getElementById("humidity").textContent = current.main.humidity;
+      document.getElementById("wind").textContent = Math.round(current.wind.speed);
+
+      const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`);
+      const forecastData = await forecastRes.json();
+
+      const forecast = document.getElementById("forecast");
+      forecast.innerHTML = "";
+
+      let dailyData = {};
+      forecastData.list.forEach(item => {
+        const date = item.dt_txt.split(" ")[0];
+        if (!dailyData[date] && Object.keys(dailyData).length < 5) {
+          dailyData[date] = item;
+        }
+      });
+
+      Object.values(dailyData).forEach(day => {
+        const date = new Date(day.dt_txt);
+        const dayName = date.toLocaleDateString('en-IN', { weekday: 'short' });
+        const temp = Math.round(day.main.temp);
+        const icon = day.weather[0].icon;
+        const div = document.createElement("div");
+        div.className = "forecast-day";
+        div.innerHTML = `<strong>${dayName}</strong><br><img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="weather icon"><br>${temp}°C`;
+        forecast.appendChild(div);
+      });
+    } catch (error) {
+      console.error("Weather fetch error:", error);
+    }
+  }
+
+  fetchWeather();
+</script>
             <section class="category-section">
                 <div class="section-header">
                     <h2 class="section-title">भिलाई समाचार</h2>
