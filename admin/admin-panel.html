@@ -1,0 +1,2293 @@
+<!DOCTYPE html>
+
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>एडमिन पैनल - The Bhilai Report</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --primary: #3e97ff;
+            --secondary: #50cd89;
+            --destructive: #f1416c;
+            --warning: #ffc700;
+            --background: #ffffff;
+            --foreground: #1e1e1e;
+            --background-dark: #121212;
+            --foreground-dark: #f0f0f0;
+            --card: #ffffff;
+            --card-dark: #1e1e1e;
+            --border: #e2e8f0;
+            --border-dark: #2d3748;
+            --sidebar: #1e1e2d;
+            --sidebar-hover: rgba(62, 151, 255, 0.1);
+            --muted: #f1f5f9;
+            --muted-dark: #2d3748;
+            --muted-foreground: #64748b;
+            --muted-foreground-dark: #a1a1aa;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        body.dark {
+            background-color: var(--background-dark);
+            color: var(--foreground-dark);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+
+        input, textarea, select {
+            font-family: inherit;
+        }
+
+        /* Layout */
+        .admin-panel {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            z-index: 100;
+            transition: transform 0.3s;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Logo & Header */
+        .logo {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .logo h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header {
+            background-color: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        body.dark .header {
+            background-color: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+
+        .toggle-sidebar {
+            display: none;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .toggle-sidebar {
+                display: block;
+            }
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--destructive);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Navigation */
+        .nav-menu {
+            padding: 10px 0;
+        }
+
+        .nav-menu li a, .nav-menu li button {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #b5b5c3;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-menu li a:hover, .nav-menu li button:hover {
+            background-color: var(--sidebar-hover);
+            color: var(--primary);
+        }
+
+        .nav-menu li.active a {
+            background-color: var(--sidebar-hover);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--foreground);
+        }
+
+        body.dark .section-title {
+            color: var(--foreground-dark);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: flex-start;
+        }
+
+        body.dark .stat-card {
+            background-color: var(--card-dark);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .stat-info h3 {
+            font-size: 14px;
+            color: var(--muted-foreground);
+            margin-bottom: 5px;
+        }
+
+        body.dark .stat-info h3 {
+            color: var(--muted-foreground-dark);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-change.positive {
+            color: var(--secondary);
+        }
+
+        .stat-change.negative {
+            color: var(--destructive);
+        }
+
+        /* Activity List */
+        .recent-activity {
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        body.dark .recent-activity {
+            background-color: var(--card-dark);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        body.dark .activity-item {
+            border-color: var(--border-dark);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            margin-right: 15px;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-details p {
+            margin-bottom: 5px;
+        }
+
+        .time {
+            font-size: 12px;
+            color: var(--muted-foreground);
+        }
+
+        body.dark .time {
+            color: var(--muted-foreground-dark);
+        }
+
+        /* Forms */
+        .news-form {
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .news-form {
+            background-color: var(--card-dark);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--foreground);
+            transition: border-color 0.3s;
+        }
+
+        body.dark .form-control {
+            border-color: var(--border-dark);
+            background-color: var(--background-dark);
+            color: var(--foreground-dark);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        body.dark .file-upload {
+            border-color: var(--border-dark);
+        }
+
+        .file-upload input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            max-width: 100%;
+        }
+
+        .file-preview img {
+            max-height: 200px;
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        /* Editor Toolbar */
+        .editor-toolbar {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            background-color: var(--muted);
+        }
+
+        body.dark .editor-toolbar {
+            border-color: var(--border-dark);
+            background-color: var(--muted-dark);
+        }
+
+        .toolbar-btn {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            color: var(--foreground);
+            transition: all 0.2s;
+        }
+
+        body.dark .toolbar-btn {
+            color: var(--foreground-dark);
+        }
+
+        .toolbar-btn:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .editor-content {
+            min-height: 300px;
+            border: 1px solid var(--border);
+            border-radius: 0 0 5px 5px;
+            padding: 15px;
+            background-color: var(--background);
+            color: var(--foreground);
+        }
+
+        body.dark .editor-content {
+            border-color: var(--border-dark);
+            background-color: var(--background-dark);
+            color: var(--foreground-dark);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e86ef;
+        }
+
+        .btn-success {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #40bd79;
+        }
+
+        .btn-danger {
+            background-color: var(--destructive);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e1315c;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border);
+            background-color: transparent;
+            color: var(--foreground);
+        }
+
+        body.dark .btn-outline {
+            border-color: var(--border-dark);
+            color: var(--foreground-dark);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--muted);
+        }
+
+        body.dark .btn-outline:hover {
+            background-color: var(--muted-dark);
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        /* Table */
+        .table-container {
+            background-color: var(--card);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .table-container {
+            background-color: var(--card-dark);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        body.dark .table th, 
+        body.dark .table td {
+            border-color: var(--border-dark);
+        }
+
+        .table th {
+            background-color: var(--muted);
+            font-weight: 600;
+        }
+
+        body.dark .table th {
+            background-color: var(--muted-dark);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-action {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark .login-card {
+            background-color: var(--card-dark);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo h1 {
+            font-size: 24px;
+            margin-top: 15px;
+        }
+
+        .login-logo p {
+            font-size: 14px;
+            color: var(--muted-foreground);
+        }
+
+        body.dark .login-logo p {
+            color: var(--muted-foreground-dark);
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .login-divider::before, .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--border);
+        }
+
+        body.dark .login-divider::before, 
+        body.dark .login-divider::after {
+            background-color: var(--border-dark);
+        }
+
+        .login-divider-text {
+            padding: 0 10px;
+            color: var(--muted-foreground);
+        }
+
+        body.dark .login-divider-text {
+            color: var(--muted-foreground-dark);
+        }
+
+        /* Media Queries */
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        body.dark .spinner {
+            border-color: rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+<!-- Login Section -->
+<div class="login-container" id="login-section">
+<div class="login-card">
+<div class="login-logo">
+<img alt="The Bhilai Report Logo" src="logo.png" style="width: 60px; height: 60px; border-radius: 12px;"/>
+<h1>The Bhilai Report</h1>
+<p>एडमिन पैनल में लॉग इन करें</p>
+</div>
+<form id="login-form">
+<div class="form-group">
+<input class="form-control" id="email" placeholder="ईमेल आईडी" required="" type="email"/>
+</div>
+<div class="form-group">
+<input class="form-control" id="password" placeholder="पासवर्ड" required="" type="password"/>
+</div>
+<div class="form-group">
+<button class="btn btn-primary" style="width: 100%;" type="submit">
+<i class="fas fa-sign-in-alt"></i> लॉग इन करें
+                        </button>
+</div>
+</form>
+<div class="login-divider">
+<span class="login-divider-text">या</span>
+</div>
+<button class="btn btn-outline" id="google-login" style="width: 100%;">
+<i class="fab fa-google"></i> Google के साथ जारी रखें
+                </button>
+<p style="text-align:center; margin-top:15px; font-weight:bold; color: #ff4d4d;">Made with Avinash_Sona</p></div>
+</div>
+<!-- Admin Panel -->
+<div class="admin-panel" id="admin-panel" style="display: none;">
+<div class="sidebar" id="sidebar">
+<div class="logo">
+<img alt="The Bhilai Report Logo" src="logo.png" style="width: 60px; height: 60px; border-radius: 12px;"/>
+<h2>एडमिन पैनल</h2>
+</div>
+<ul class="nav-menu">
+<li class="active" data-section="dashboard"><a href="#dashboard"><i class="fas fa-tachometer-alt"></i> डैशबोर्ड</a></li>
+<li data-section="add-news"><a href="#add-news"><i class="fas fa-newspaper"></i> नई खबर जोड़ें</a></li>
+<li data-section="manage-news"><a href="#manage-news"><i class="fas fa-list"></i> समाचार प्रबंधन</a></li>
+<li data-section="categories"><a href="#categories"><i class="fas fa-tags"></i> श्रेणियाँ</a></li>
+<li data-section="media"><a href="#media"><i class="fas fa-images"></i> मीडिया</a></li>
+<li data-section="settings"><a href="#settings"><i class="fas fa-cog"></i> सेटिंग्स</a></li>
+<li><a href="#" target="_blank"><i class="fas fa-eye"></i> वेबसाइट देखें</a></li>
+<li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> लॉगआउट</a></li>
+</ul>
+</div>
+<div class="main-content">
+<div class="header">
+<div class="toggle-sidebar" id="toggle-sidebar">
+<i class="fas fa-bars"></i>
+</div>
+<div class="admin-info">
+<div class="notification">
+<i class="fas fa-bell"></i>
+<span class="badge">3</span>
+</div>
+<div class="theme-toggle" id="theme-toggle">
+<i class="fas fa-moon"></i>
+</div>
+<div class="admin-profile">
+<span id="user-name">अविनाश सोना</span>
+<img alt="Admin" class="admin-img" id="user-photo" src="https://via.placeholder.com/40"/>
+</div>
+</div>
+</div>
+<div class="content-area">
+<!-- Dashboard Section -->
+<section class="section active" id="dashboard">
+<h2 class="section-title">डैशबोर्ड</h2>
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon" style="background-color: #3e97ff;">
+<i class="fas fa-newspaper"></i>
+</div>
+<div class="stat-info">
+<h3>कुल समाचार</h3>
+<p class="stat-value" id="news-count">0</p>
+<p class="stat-change positive"><i class="fas fa-arrow-up"></i> 24% इस महीने</p>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background-color: #50cd89;">
+<i class="fas fa-users"></i>
+</div>
+<div class="stat-info">
+<h3>आज के दर्शक</h3>
+<p class="stat-value">8,547</p>
+<p class="stat-change positive"><i class="fas fa-arrow-up"></i> 12% कल से</p>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background-color: #f1416c;">
+<i class="fas fa-comments"></i>
+</div>
+<div class="stat-info">
+<h3>टिप्पणियाँ</h3>
+<p class="stat-value">682</p>
+<p class="stat-change negative"><i class="fas fa-arrow-down"></i> 4% इस सप्ताह</p>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background-color: #ffc700;">
+<i class="fas fa-share-alt"></i>
+</div>
+<div class="stat-info">
+<h3>सोशल शेयर</h3>
+<p class="stat-value">1,204</p>
+<p class="stat-change positive"><i class="fas fa-arrow-up"></i> 30% इस महीने</p>
+</div>
+</div>
+</div>
+<div class="recent-activity">
+<div class="section-header">
+<h3>हाल की गतिविधि</h3>
+<button class="btn btn-outline">सभी देखें</button>
+</div>
+<div class="activity-list" id="activity-list">
+<div class="loading">
+<div class="spinner"></div>
+</div>
+</div>
+</div>
+<div class="recent-activity">
+<div class="section-header">
+<h3>हाल के समाचार</h3>
+<button class="btn btn-outline">सभी देखें</button>
+</div>
+<div class="table-container">
+<table class="table">
+<thead>
+<tr>
+<th>शीर्षक</th>
+<th>श्रेणी</th>
+<th>दिनांक</th>
+<th>स्थिति</th>
+<th>कार्य</th>
+</tr>
+</thead>
+<tbody id="recent-news">
+<tr>
+<td colspan="5">
+<div class="loading">
+<div class="spinner"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Add News Section -->
+<section class="section" id="add-news">
+<h2 class="section-title">नई खबर जोड़ें</h2>
+<form class="news-form" id="add-news-form">
+<div class="form-group">
+<label for="news-title">समाचार का शीर्षक</label>
+<input class="form-control" id="news-title" placeholder="समाचार का शीर्षक यहां लिखें..." required="" type="text"/>
+</div>
+<div class="form-group">
+<label for="news-category">श्रेणी</label>
+<select class="form-control form-select" id="news-category" required="">
+<option value="">श्रेणी चुनें</option>
+</select>
+</div>
+<div class="form-group">
+<label for="news-tags">टैग्स</label>
+<input class="form-control" id="news-tags" placeholder="अल्पविराम से अलग करें (जैसे: भिलाई, छत्तीसगढ़)" type="text"/>
+</div>
+<div class="form-group">
+<label for="news-featured-image">मुख्य छवि</label>
+<div class="file-upload">
+<input accept="image/*" id="news-featured-image" type="file"/>
+<label class="file-label" for="news-featured-image">
+<i class="fas fa-cloud-upload-alt"></i>
+                                        छवि अपलोड करें
+                                    </label>
+<div class="file-preview" id="image-preview"></div>
+</div>
+</div>
+<div class="form-group">
+<label for="news-excerpt">संक्षिप्त विवरण</label>
+<textarea class="form-control" id="news-excerpt" placeholder="समाचार का संक्षिप्त विवरण यहां लिखें..." required="" rows="3"></textarea>
+</div>
+<div class="form-group">
+<label for="news-content">पूरा समाचार</label>
+<div class="editor-toolbar">
+<button class="toolbar-btn" data-command="bold" type="button"><i class="fas fa-bold"></i></button>
+<button class="toolbar-btn" data-command="italic" type="button"><i class="fas fa-italic"></i></button>
+<button class="toolbar-btn" data-command="underline" type="button"><i class="fas fa-underline"></i></button>
+<button class="toolbar-btn" data-command="strikeThrough" type="button"><i class="fas fa-strikethrough"></i></button>
+<button class="toolbar-btn" data-command="insertUnorderedList" type="button"><i class="fas fa-list-ul"></i></button>
+<button class="toolbar-btn" data-command="insertOrderedList" type="button"><i class="fas fa-list-ol"></i></button>
+<button class="toolbar-btn" data-command="createLink" type="button"><i class="fas fa-link"></i></button>
+<button class="toolbar-btn" data-command="insertImage" type="button"><i class="fas fa-image"></i></button>
+<button class="toolbar-btn" data-command="formatBlock" data-value="h1" type="button"><i class="fas fa-heading"></i></button>
+<button class="toolbar-btn" data-command="justifyLeft" type="button"><i class="fas fa-align-left"></i></button>
+<button class="toolbar-btn" data-command="justifyCenter" type="button"><i class="fas fa-align-center"></i></button>
+<button class="toolbar-btn" data-command="justifyRight" type="button"><i class="fas fa-align-right"></i></button>
+</div>
+<div class="editor-content" contenteditable="true" id="news-content"></div>
+</div>
+<div class="form-group">
+<label for="news-status">स्थिति</label>
+<select class="form-control form-select" id="news-status">
+<option value="published">प्रकाशित करें</option>
+<option value="draft">ड्राफ्ट सहेजें</option>
+</select>
+</div>
+<div class="form-group" style="text-align: right;">
+<button class="btn btn-outline" id="cancel-news" type="button">रद्द करें</button>
+<button class="btn btn-primary" type="submit">
+<i class="fas fa-save"></i> सहेजें और प्रकाशित करें
+                                </button>
+</div>
+</form>
+</section>
+<!-- Manage News Section -->
+<section class="section" id="manage-news">
+<h2 class="section-title">समाचार प्रबंधन</h2>
+<div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+<div class="search-box">
+<input class="form-control" id="news-search" placeholder="खोज..." style="width: 250px;" type="text"/>
+</div>
+<button class="btn btn-primary" id="add-news-btn">
+<i class="fas fa-plus"></i> नया समाचार
+                            </button>
+</div>
+<div class="table-container">
+<table class="table">
+<thead>
+<tr>
+<th>शीर्षक</th>
+<th>श्रेणी</th>
+<th>प्रकाशित</th>
+<th>स्थिति</th>
+<th>कार्य</th>
+</tr>
+</thead>
+<tbody id="news-list">
+<tr>
+<td colspan="5">
+<div class="loading">
+<div class="spinner"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Categories Section -->
+<section class="section" id="categories">
+<h2 class="section-title">श्रेणियाँ</h2>
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+<div class="table-container">
+<table class="table">
+<thead>
+<tr>
+<th>नाम</th>
+<th>स्लग</th>
+<th>समाचारों की संख्या</th>
+<th>कार्य</th>
+</tr>
+</thead>
+<tbody id="categories-list">
+<tr>
+<td colspan="4">
+<div class="loading">
+<div class="spinner"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div>
+<div class="news-form">
+<h3 id="category-form-title">श्रेणी जोड़ें</h3>
+<form id="category-form">
+<input id="category-id" type="hidden"/>
+<div class="form-group">
+<label for="category-name">श्रेणी का नाम</label>
+<input class="form-control" id="category-name" required="" type="text"/>
+</div>
+<div class="form-group">
+<label for="category-slug">स्लग</label>
+<input class="form-control" id="category-slug" required="" type="text"/>
+</div>
+<div class="form-group">
+<label for="category-description">विवरण</label>
+<textarea class="form-control" id="category-description" rows="3"></textarea>
+</div>
+<div class="form-group" style="text-align: right;">
+<button class="btn btn-outline" id="cancel-category" type="button">रद्द करें</button>
+<button class="btn btn-primary" type="submit">
+<i class="fas fa-save"></i> सहेजें
+                                            </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</section>
+<!-- Media Section -->
+<section class="section" id="media">
+<h2 class="section-title">मीडिया</h2>
+<div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+<div class="search-box">
+<input class="form-control" id="media-search" placeholder="खोज..." style="width: 250px;" type="text"/>
+</div>
+<button class="btn btn-primary" id="upload-media-btn">
+<i class="fas fa-upload"></i> मीडिया अपलोड करें
+                            </button>
+</div>
+<div class="media-grid" id="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+<div class="loading">
+<div class="spinner"></div>
+</div>
+</div>
+<!-- Upload Media Dialog (Hidden by default) -->
+<div id="upload-dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; max-width: 90%; background-color: var(--background); border-radius: 10px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<h3>मीडिया अपलोड करें</h3>
+<button id="close-upload-dialog" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<div class="file-upload">
+<input accept="image/*" id="media-file" type="file"/>
+<label class="file-label" for="media-file">
+<i class="fas fa-cloud-upload-alt"></i>
+                                        छवि अपलोड करें
+                                    </label>
+<div class="file-preview" id="media-preview"></div>
+</div>
+<div id="upload-progress" style="margin-top: 20px; display: none;">
+<div style="height: 5px; background-color: #eee; border-radius: 5px; overflow: hidden;">
+<div id="progress-bar" style="height: 100%; width: 0; background-color: var(--primary);"></div>
+</div>
+<p style="text-align: right; margin-top: 5px; font-size: 12px;"><span id="progress-percent">0</span>%</p>
+</div>
+<div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+<button class="btn btn-outline" id="cancel-upload">रद्द करें</button>
+<button class="btn btn-primary" id="confirm-upload">
+<i class="fas fa-upload"></i> अपलोड करें
+                                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Settings Section -->
+<section class="section" id="settings">
+<h2 class="section-title">सेटिंग्स</h2>
+<div class="news-form">
+<h3>वेबसाइट सेटिंग्स</h3>
+<form id="settings-form">
+<div class="form-group">
+<label for="site-name">वेबसाइट का नाम</label>
+<input class="form-control" id="site-name" type="text" value="The Bhilai Report"/>
+</div>
+<div class="form-group">
+<label for="site-tagline">टैगलाइन</label>
+<input class="form-control" id="site-tagline" type="text" value="भिलाई की आवाज़"/>
+</div>
+<div class="form-group">
+<label for="site-description">वेबसाइट का विवरण</label>
+<textarea class="form-control" id="site-description" rows="3">भिलाई और छत्तीसगढ़ की खबरें सबसे पहले और सबसे विश्वसनीय</textarea>
+</div>
+<div class="form-group">
+<label for="admin-email">एडमिन ईमेल</label>
+<input class="form-control" id="admin-email" type="email" value="admin@bhilaireport.com"/>
+</div>
+<div class="form-group">
+<label>प्राथमिक भाषा</label>
+<div style="display: flex; gap: 20px; margin-top: 10px;">
+<label style="display: flex; align-items: center;">
+<input checked="" name="language" type="radio" value="hindi"/>
+<span style="margin-left: 10px;">हिंदी</span>
+</label>
+<label style="display: flex; align-items: center;">
+<input name="language" type="radio" value="english"/>
+<span style="margin-left: 10px;">अंग्रेज़ी</span>
+</label>
+<label style="display: flex; align-items: center;">
+<input name="language" type="radio" value="bilingual"/>
+<span style="margin-left: 10px;">द्विभाषी</span>
+</label>
+</div>
+</div>
+<div class="form-group">
+<label>अतिरिक्त विकल्प</label>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+<label style="display: flex; align-items: center;">
+<input checked="" id="enable-comments" type="checkbox"/>
+<span style="margin-left: 10px;">टिप्पणियाँ सक्षम करें</span>
+</label>
+<label style="display: flex; align-items: center;">
+<input checked="" id="moderation-required" type="checkbox"/>
+<span style="margin-left: 10px;">टिप्पणियों को प्रकाशित करने से पहले मॉडरेशन आवश्यक है</span>
+</label>
+<label style="display: flex; align-items: center;">
+<input checked="" id="social-sharing" type="checkbox"/>
+<span style="margin-left: 10px;">सोशल मीडिया शेयरिंग सक्षम करें</span>
+</label>
+</div>
+</div>
+<div class="form-group" style="text-align: right;">
+<button class="btn btn-outline" id="reset-settings" type="button">रीसेट करें</button>
+<button class="btn btn-primary" type="submit">
+<i class="fas fa-save"></i> सेटिंग्स सहेजें
+                                    </button>
+</div>
+</form>
+</div>
+</section>
+</div>
+</div>
+</div>
+</div>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjahJP1H9nH3_tnECOObm_Vjg2ku7HmNs",
+            authDomain: "the-bhilai-report-by-avinash.firebaseapp.com",
+            projectId: "the-bhilai-report-by-avinash",
+            storageBucket: "the-bhilai-report-by-avinash.appspot.com",
+            messagingSenderId: "868804924915",
+            appId: "1:868804924915:web:fabec9ceb993da09a02e86"
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Firebase वातावरण चर से कॉन्फ़िगरेशन प्राप्त करें
+            const getFirebaseConfig = () => {
+                // URL से परम प्राप्त करें (जहां फायरबेस चर हैं)
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                return {
+                    apiKey: urlParams.get('apiKey') || '',
+                    authDomain: `${urlParams.get('projectId') || ''}.firebaseapp.com`,
+                    projectId: urlParams.get('projectId') || '',
+                    storageBucket: `${urlParams.get('projectId') || ''}.appspot.com`,
+                    messagingSenderId: urlParams.get('messagingSenderId') || '',
+                    appId: urlParams.get('appId') || ''
+                };
+            };
+
+            // Firebase को आरंभ करें
+            const initFirebase = () => {
+                const config = getFirebaseConfig();
+                
+                if (!config.apiKey || !config.projectId || !config.appId) {
+                    console.error('फायरबेस कॉन्फ़िगरेशन उपलब्ध नहीं है। URL में सही परम जोड़ें।');
+                    alert('फायरबेस कॉन्फ़िगरेशन उपलब्ध नहीं है। कृपया इस URL को अपडेट करें और फिर से प्रयास करें।');
+                    return null;
+                }
+                
+                // फायरबेस अनुप्रयोग आरंभ करें
+                firebase.initializeApp(config);
+                return firebase;
+            };
+
+            // Firebase आरंभ करें
+            const app = initFirebase();
+            if (!app) return;
+            
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            const storage = firebase.storage();
+            
+            // रूट कंटेनर
+            const appContainer = document.getElementById('app');
+            const loginSection = document.getElementById('login-section');
+            const adminPanel = document.getElementById('admin-panel');
+            
+            // लॉगिन फॉर्म
+            const loginForm = document.getElementById('login-form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const googleLoginBtn = document.getElementById('google-login');
+            
+            // साइडबार प्रबंधन
+            const sidebar = document.getElementById('sidebar');
+            const toggleSidebarBtn = document.getElementById('toggle-sidebar');
+            const navItems = document.querySelectorAll('.nav-menu li[data-section]');
+            const sections = document.querySelectorAll('.section');
+            
+            // लॉगआउट बटन
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            // थीम टॉगल
+            const themeToggle = document.getElementById('theme-toggle');
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // फॉर्म्स और डेटा प्रबंधन
+            const addNewsForm = document.getElementById('add-news-form');
+            const addNewsBtn = document.getElementById('add-news-btn');
+            const cancelNewsBtn = document.getElementById('cancel-news');
+            const newsContentEditor = document.getElementById('news-content');
+            const editorButtons = document.querySelectorAll('.toolbar-btn');
+            const newsImageInput = document.getElementById('news-featured-image');
+            const imagePreview = document.getElementById('image-preview');
+            
+            // मीडिया सेक्शन
+            const uploadMediaBtn = document.getElementById('upload-media-btn');
+            const uploadDialog = document.getElementById('upload-dialog');
+            const closeUploadDialogBtn = document.getElementById('close-upload-dialog');
+            const cancelUploadBtn = document.getElementById('cancel-upload');
+            const confirmUploadBtn = document.getElementById('confirm-upload');
+            const mediaFileInput = document.getElementById('media-file');
+            const mediaPreview = document.getElementById('media-preview');
+            const uploadProgress = document.getElementById('upload-progress');
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            
+            // श्रेणी प्रबंधन
+            const categoryForm = document.getElementById('category-form');
+            const categoryIdInput = document.getElementById('category-id');
+            const categoryNameInput = document.getElementById('category-name');
+            const categorySlugInput = document.getElementById('category-slug');
+            const categoryDescriptionInput = document.getElementById('category-description');
+            const categoryFormTitle = document.getElementById('category-form-title');
+            const cancelCategoryBtn = document.getElementById('cancel-category');
+            
+            // सेटिंग्स
+            const settingsForm = document.getElementById('settings-form');
+            const resetSettingsBtn = document.getElementById('reset-settings');
+
+            // डेटा कंटेनर्स
+            const activityList = document.getElementById('activity-list');
+            const recentNewsList = document.getElementById('recent-news');
+            const newsList = document.getElementById('news-list');
+            const categoriesList = document.getElementById('categories-list');
+            const mediaGrid = document.getElementById('media-grid');
+            const newsCategory = document.getElementById('news-category');
+            const newsCountElement = document.getElementById('news-count');
+            
+            // फ़ंक्शन्स
+            
+            // प्रमाणीकरण स्थिति परिवर्तन प्रबंधन
+            const handleAuthStateChanged = (user) => {
+                if (user) {
+                    // उपयोगकर्ता लॉग इन है
+                    loginSection.style.display = 'none';
+                    adminPanel.style.display = 'flex';
+                    
+                    // उपयोगकर्ता जानकारी प्रदर्शित करें
+                    document.getElementById('user-name').textContent = user.displayName || 'Admin';
+                    if (user.photoURL) {
+                        document.getElementById('user-photo').src = user.photoURL;
+                    }
+                    
+                    // डेटा लोड करें
+                    loadDashboardData();
+                    loadCategories();
+                    loadNewsData();
+                    loadMediaData();
+                } else {
+                    // उपयोगकर्ता लॉग आउट है
+                    loginSection.style.display = 'flex';
+                    adminPanel.style.display = 'none';
+                    
+                    // फॉर्म्स रीसेट करें
+                    loginForm.reset();
+                }
+            };
+            
+            // ईमेल और पासवर्ड से लॉगिन
+            const loginWithEmailPassword = (email, password) => {
+                return auth.signInWithEmailAndPassword(email, password)
+                    .catch(error => {
+                        console.error('Login error:', error);
+                        alert(`लॉगिन में त्रुटि: ${error.message}`);
+                    });
+            };
+            
+            // Google से लॉगिन
+            const loginWithGoogle = () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                return auth.signInWithPopup(provider)
+                    .catch(error => {
+                        console.error('Google login error:', error);
+                        alert(`Google लॉगिन में त्रुटि: ${error.message}`);
+                    });
+            };
+            
+            // लॉगआउट
+            const logout = () => {
+                return auth.signOut()
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        alert(`लॉगआउट में त्रुटि: ${error.message}`);
+                    });
+            };
+            
+            // डैशबोर्ड डेटा लोड
+            const loadDashboardData = async () => {
+                try {
+                    // समाचार संख्या अपडेट करें
+                    const newsSnapshot = await db.collection('news').get();
+                    const newsCount = newsSnapshot.size;
+                    newsCountElement.textContent = newsCount;
+                    
+                    // हाल की गतिविधि लोड करें
+                    const activitiesSnapshot = await db.collection('activities')
+                        .orderBy('createdAt', 'desc')
+                        .limit(4)
+                        .get();
+                    
+                    if (!activitiesSnapshot.empty) {
+                        let activitiesHTML = '';
+                        
+                        activitiesSnapshot.forEach(doc => {
+                            const activity = doc.data();
+                            const iconColor = activity.iconColor || 'primary';
+                            
+                            activitiesHTML += `
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background-color: var(--${iconColor});">
+                                        <i class="fas ${activity.icon || 'fa-info'}"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p><strong>${activity.title || ''}</strong> ${activity.description || ''}</p>
+                                        <span class="time">${activity.time || '10 मिनट पहले'}</span>
+                                    </div>
+                                    <div class="activity-action">
+                                        <button class="btn btn-sm btn-outline">देखें</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        activityList.innerHTML = activitiesHTML;
+                    } else {
+                        activityList.innerHTML = '<p style="text-align: center; padding: 20px;">कोई हालिया गतिविधि नहीं</p>';
+                    }
+                    
+                    // हाल के समाचार लोड करें
+                    const recentNewsSnapshot = await db.collection('news')
+                        .orderBy('createdAt', 'desc')
+                        .limit(5)
+                        .get();
+                    
+                    if (!recentNewsSnapshot.empty) {
+                        let recentNewsHTML = '';
+                        
+                        recentNewsSnapshot.forEach(doc => {
+                            const news = doc.data();
+                            const createdAt = news.createdAt ? new Date(news.createdAt.seconds * 1000) : new Date();
+                            const formattedDate = new Intl.DateTimeFormat('hi-IN', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            }).format(createdAt);
+                            
+                            let statusClass, statusText;
+                            switch (news.status) {
+                                case 'published':
+                                    statusClass = 'bg-success';
+                                    statusText = 'प्रकाशित';
+                                    break;
+                                case 'draft':
+                                    statusClass = 'bg-warning';
+                                    statusText = 'ड्राफ्ट';
+                                    break;
+                                default:
+                                    statusClass = 'bg-secondary';
+                                    statusText = 'अप्रकाशित';
+                            }
+                            
+                            recentNewsHTML += `
+                                <tr>
+                                    <td>${news.title}</td>
+                                    <td>${news.category || 'अवर्गीकृत'}</td>
+                                    <td>${formattedDate}</td>
+                                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                    <td>
+                                        <div class="table-action">
+                                            <button class="btn btn-sm btn-outline edit-news" data-id="${doc.id}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline delete-news" data-id="${doc.id}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        
+                        recentNewsList.innerHTML = recentNewsHTML;
+                    } else {
+                        recentNewsList.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">कोई हालिया समाचार नहीं</td></tr>';
+                    }
+                } catch (error) {
+                    console.error('Error loading dashboard data:', error);
+                    alert('डैशबोर्ड डेटा लोड करने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // श्रेणियाँ लोड करें
+            const loadCategories = async () => {
+                try {
+                    const snapshot = await db.collection('categories')
+                        .orderBy('name')
+                        .get();
+                    
+                    if (!snapshot.empty) {
+                        let categoriesHTML = '';
+                        let categoriesOptions = '<option value="">श्रेणी चुनें</option>';
+                        
+                        snapshot.forEach(doc => {
+                            const category = doc.data();
+                            
+                            categoriesHTML += `
+                                <tr>
+                                    <td>${category.name}</td>
+                                    <td>${category.slug}</td>
+                                    <td>${category.newsCount || 0}</td>
+                                    <td>
+                                        <div class="table-action">
+                                            <button class="btn btn-sm btn-outline edit-category" data-id="${doc.id}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline delete-category" data-id="${doc.id}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                            
+                            categoriesOptions += `<option value="${category.slug}">${category.name}</option>`;
+                        });
+                        
+                        categoriesList.innerHTML = categoriesHTML;
+                        newsCategory.innerHTML = categoriesOptions;
+                        
+                        // श्रेणी संपादन और हटाने के बटन्स के लिए इवेंट लिसनर्स जोड़ें
+                        document.querySelectorAll('.edit-category').forEach(button => {
+                            button.addEventListener('click', () => editCategory(button.dataset.id));
+                        });
+                        
+                        document.querySelectorAll('.delete-category').forEach(button => {
+                            button.addEventListener('click', () => deleteCategory(button.dataset.id));
+                        });
+                    } else {
+                        categoriesList.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">कोई श्रेणी नहीं मिली</td></tr>';
+                        newsCategory.innerHTML = '<option value="">श्रेणी चुनें</option>';
+                    }
+                } catch (error) {
+                    console.error('Error loading categories:', error);
+                    alert('श्रेणियाँ लोड करने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // समाचार डेटा लोड करें
+            const loadNewsData = async () => {
+                try {
+                    const snapshot = await db.collection('news')
+                        .orderBy('createdAt', 'desc')
+                        .get();
+                    
+                    if (!snapshot.empty) {
+                        let newsHTML = '';
+                        
+                        snapshot.forEach(doc => {
+                            const news = doc.data();
+                            const createdAt = news.createdAt ? new Date(news.createdAt.seconds * 1000) : new Date();
+                            const formattedDate = new Intl.DateTimeFormat('hi-IN', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            }).format(createdAt);
+                            
+                            let statusClass, statusText;
+                            switch (news.status) {
+                                case 'published':
+                                    statusClass = 'bg-success';
+                                    statusText = 'प्रकाशित';
+                                    break;
+                                case 'draft':
+                                    statusClass = 'bg-warning';
+                                    statusText = 'ड्राफ्ट';
+                                    break;
+                                default:
+                                    statusClass = 'bg-secondary';
+                                    statusText = 'अप्रकाशित';
+                            }
+                            
+                            newsHTML += `
+                                <tr>
+                                    <td>${news.title}</td>
+                                    <td>${news.category || 'अवर्गीकृत'}</td>
+                                    <td>${formattedDate}</td>
+                                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                    <td>
+                                        <div class="table-action">
+                                            <button class="btn btn-sm btn-outline view-news" data-id="${doc.id}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-news" data-id="${doc.id}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline delete-news" data-id="${doc.id}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        
+                        newsList.innerHTML = newsHTML;
+                        
+                        // समाचार संपादन और हटाने के बटन्स के लिए इवेंट लिसनर्स जोड़ें
+                        document.querySelectorAll('.edit-news').forEach(button => {
+                            button.addEventListener('click', () => editNews(button.dataset.id));
+                        });
+                        
+                        document.querySelectorAll('.delete-news').forEach(button => {
+                            button.addEventListener('click', () => deleteNews(button.dataset.id));
+                        });
+                        
+                        document.querySelectorAll('.view-news').forEach(button => {
+                            button.addEventListener('click', () => viewNews(button.dataset.id));
+                        });
+                    } else {
+                        newsList.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">कोई समाचार नहीं मिला</td></tr>';
+                    }
+                } catch (error) {
+                    console.error('Error loading news:', error);
+                    alert('समाचार लोड करने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // मीडिया डेटा लोड करें
+            const loadMediaData = async () => {
+                try {
+                    const snapshot = await db.collection('media')
+                        .orderBy('createdAt', 'desc')
+                        .get();
+                    
+                    if (!snapshot.empty) {
+                        let mediaHTML = '';
+                        
+                        snapshot.forEach(doc => {
+                            const media = doc.data();
+                            
+                            mediaHTML += `
+                                <div class="media-item">
+                                    <img src="${media.url}" alt="${media.alt || media.name}" class="media-thumbnail">
+                                    <div class="media-actions">
+                                        <button class="btn btn-sm btn-outline view-media" data-id="${doc.id}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline delete-media" data-id="${doc.id}" data-path="${media.path}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <p class="media-name">${media.name}</p>
+                                </div>
+                            `;
+                        });
+                        
+                        mediaGrid.innerHTML = mediaHTML;
+                        
+                        // मीडिया संपादन और हटाने के बटन्स के लिए इवेंट लिसनर्स जोड़ें
+                        document.querySelectorAll('.view-media').forEach(button => {
+                            button.addEventListener('click', () => viewMedia(button.dataset.id));
+                        });
+                        
+                        document.querySelectorAll('.delete-media').forEach(button => {
+                            button.addEventListener('click', () => deleteMedia(button.dataset.id, button.dataset.path));
+                        });
+                    } else {
+                        mediaGrid.innerHTML = '<p style="text-align: center; padding: 20px; grid-column: 1 / -1;">कोई मीडिया नहीं मिला</p>';
+                    }
+                } catch (error) {
+                    console.error('Error loading media:', error);
+                    alert('मीडिया लोड करने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // श्रेणी संपादित करें
+            const editCategory = async (categoryId) => {
+                try {
+                    const doc = await db.collection('categories').doc(categoryId).get();
+                    
+                    if (doc.exists) {
+                        const category = doc.data();
+                        
+                        categoryIdInput.value = categoryId;
+                        categoryNameInput.value = category.name || '';
+                        categorySlugInput.value = category.slug || '';
+                        categoryDescriptionInput.value = category.description || '';
+                        
+                        categoryFormTitle.textContent = 'श्रेणी संपादित करें';
+                    } else {
+                        alert('श्रेणी नहीं मिली');
+                    }
+                } catch (error) {
+                    console.error('Error editing category:', error);
+                    alert('श्रेणी संपादित करने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // श्रेणी हटाएं
+            const deleteCategory = async (categoryId) => {
+                if (confirm('क्या आप वाकई इस श्रेणी को हटाना चाहते हैं?')) {
+                    try {
+                        await db.collection('categories').doc(categoryId).delete();
+                        
+                        alert('श्रेणी सफलतापूर्वक हटा दी गई');
+                        loadCategories();
+                    } catch (error) {
+                        console.error('Error deleting category:', error);
+                        alert('श्रेणी हटाने में त्रुटि: ' + error.message);
+                    }
+                }
+            };
+            
+            // समाचार संपादित करें
+            const editNews = async (newsId) => {
+                // सेक्शन चेंज करें
+                changeSection('add-news');
+                
+                try {
+                    const doc = await db.collection('news').doc(newsId).get();
+                    
+                    if (doc.exists) {
+                        const news = doc.data();
+                        
+                        // फॉर्म फील्ड्स भरें
+                        document.getElementById('news-title').value = news.title || '';
+                        document.getElementById('news-category').value = news.category || '';
+                        document.getElementById('news-tags').value = news.tags ? news.tags.join(', ') : '';
+                        document.getElementById('news-excerpt').value = news.excerpt || '';
+                        document.getElementById('news-status').value = news.status || 'published';
+                        
+                        // सामग्री एडिटर अपडेट करें
+                        newsContentEditor.innerHTML = news.content || '';
+                        
+                        // छवि प्रीव्यू दिखाएं
+                        if (news.featuredImage) {
+                            imagePreview.innerHTML = `<img src="${news.featuredImage}" alt="Featured Image">`;
+                        } else {
+                            imagePreview.innerHTML = '';
+                        }
+                        
+                        // फॉर्म के साथ समाचार आईडी संग्रहित करें
+                        addNewsForm.dataset.newsId = newsId;
+                    } else {
+                        alert('समाचार नहीं मिला');
+                    }
+                } catch (error) {
+                    console.error('Error editing news:', error);
+                    alert('समाचार संपादित करने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // समाचार हटाएं
+            const deleteNews = async (newsId) => {
+                if (confirm('क्या आप वाकई इस समाचार को हटाना चाहते हैं?')) {
+                    try {
+                        await db.collection('news').doc(newsId).delete();
+                        
+                        alert('समाचार सफलतापूर्वक हटा दिया गया');
+                        loadNewsData();
+                        loadDashboardData();
+                    } catch (error) {
+                        console.error('Error deleting news:', error);
+                        alert('समाचार हटाने में त्रुटि: ' + error.message);
+                    }
+                }
+            };
+            
+            // समाचार देखें
+            const viewNews = async (newsId) => {
+                try {
+                    const doc = await db.collection('news').doc(newsId).get();
+                    
+                    if (doc.exists) {
+                        const news = doc.data();
+                        // समाचार को नए टैब में खोलें या एक मॉडल में दिखाएं
+                        alert(`शीर्षक: ${news.title}\nश्रेणी: ${news.category}\nसंक्षिप्त विवरण: ${news.excerpt}`);
+                    } else {
+                        alert('समाचार नहीं मिला');
+                    }
+                } catch (error) {
+                    console.error('Error viewing news:', error);
+                    alert('समाचार देखने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // मीडिया देखें
+            const viewMedia = async (mediaId) => {
+                try {
+                    const doc = await db.collection('media').doc(mediaId).get();
+                    
+                    if (doc.exists) {
+                        const media = doc.data();
+                        // मीडिया को नए टैब में खोलें
+                        window.open(media.url, '_blank');
+                    } else {
+                        alert('मीडिया नहीं मिला');
+                    }
+                } catch (error) {
+                    console.error('Error viewing media:', error);
+                    alert('मीडिया देखने में त्रुटि: ' + error.message);
+                }
+            };
+            
+            // मीडिया हटाएं
+            const deleteMedia = async (mediaId, path) => {
+                if (confirm('क्या आप वाकई इस मीडिया को हटाना चाहते हैं?')) {
+                    try {
+                        // फायरस्टोर डॉक्यूमेंट हटाएं
+                        await db.collection('media').doc(mediaId).delete();
+                        
+                        // स्टोरेज फाइल हटाएं
+                        if (path) {
+                            await storage.ref(path).delete();
+                        }
+                        
+                        alert('मीडिया सफलतापूर्वक हटा दिया गया');
+                        loadMediaData();
+                    } catch (error) {
+                        console.error('Error deleting media:', error);
+                        alert('मीडिया हटाने में त्रुटि: ' + error.message);
+                    }
+                }
+            };
+            
+            // दस्तावेज़ को स्लग में बदलें
+            const slugify = (text) => {
+                return text
+                    .toString()
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\-]+/g, '')
+                    .replace(/\-\-+/g, '-');
+            };
+            
+            // सेक्शन बदलें
+            const changeSection = (sectionId) => {
+                // सभी सेक्शन्स छिपाएं
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // सभी नेविगेशन आइटम्स से active क्लास हटाएं
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // चयनित सेक्शन दिखाएं
+                const selectedSection = document.getElementById(sectionId);
+                if (selectedSection) {
+                    selectedSection.classList.add('active');
+                }
+                
+                // चयनित नेविगेशन आइटम को active करें
+                const selectedNavItem = document.querySelector(`.nav-menu li[data-section="${sectionId}"]`);
+                if (selectedNavItem) {
+                    selectedNavItem.classList.add('active');
+                }
+                
+                // मोबाइल पर साइडबार बंद करें
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            };
+            
+            // थीम टॉगल
+            const toggleTheme = () => {
+                document.body.classList.toggle('dark');
+                const isDark = document.body.classList.contains('dark');
+                
+                // आइकन अपडेट करें
+                themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                
+                // प्राथमिकता संग्रहित करें
+                localStorage.setItem('darkMode', isDark);
+            };
+            
+            // एडिटर टूलबार कमांड
+            const execCommand = (command, value = null) => {
+                document.execCommand(command, false, value);
+                newsContentEditor.focus();
+            };
+            
+            // इवेंट लिसनर्स
+            
+            // मॉडल डॉक्यूमेंट लोड
+            document.addEventListener('DOMContentLoaded', () => {
+                // थीम प्राथमिकता लागू करें
+                const savedTheme = localStorage.getItem('darkMode');
+                if (savedTheme === 'true' || (savedTheme === null && prefersDarkMode)) {
+                    document.body.classList.add('dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+                
+                // प्रमाणीकरण स्थिति परिवर्तन के लिए लिसनर सेट करें
+                auth.onAuthStateChanged(handleAuthStateChanged);
+            });
+            
+            // लॉगिन फॉर्म सबमिशन
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await loginWithEmailPassword(emailInput.value, passwordInput.value);
+            });
+            
+            // Google लॉगिन
+            googleLoginBtn.addEventListener('click', loginWithGoogle);
+            
+            // लॉगआउट
+            logoutBtn.addEventListener('click', logout);
+            
+            // साइडबार टॉगल
+            toggleSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+            
+            // थीम टॉगल
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // नेविगेशन आइटम्स
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const sectionId = item.dataset.section;
+                    changeSection(sectionId);
+                });
+            });
+            
+            // एडिटर टूलबार बटन्स
+            editorButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const command = button.dataset.command;
+                    const value = button.dataset.value || null;
+                    
+                    if (command === 'createLink') {
+                        const url = prompt('लिंक URL दर्ज करें:', 'http://');
+                        if (url) execCommand(command, url);
+                    } else if (command === 'insertImage') {
+                        const url = prompt('छवि URL दर्ज करें:', 'http://');
+                        if (url) execCommand(command, url);
+                    } else {
+                        execCommand(command, value);
+                    }
+                });
+            });
+            
+            // इमेज अपलोड और प्रीव्यू
+            newsImageInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Image Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // मीडिया अपलोड और प्रीव्यू
+            mediaFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        mediaPreview.innerHTML = `<img src="${e.target.result}" alt="Media Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // नया समाचार बटन
+            addNewsBtn.addEventListener('click', () => {
+                changeSection('add-news');
+                addNewsForm.reset();
+                newsContentEditor.innerHTML = '';
+                imagePreview.innerHTML = '';
+                delete addNewsForm.dataset.newsId;
+            });
+            
+            // समाचार रद्द बटन
+            cancelNewsBtn.addEventListener('click', () => {
+                changeSection('manage-news');
+                addNewsForm.reset();
+                newsContentEditor.innerHTML = '';
+                imagePreview.innerHTML = '';
+                delete addNewsForm.dataset.newsId;
+            });
+            
+            // समाचार फॉर्म सबमिशन
+            addNewsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                try {
+                    const title = document.getElementById('news-title').value;
+                    const category = document.getElementById('news-category').value;
+                    const tagsInput = document.getElementById('news-tags').value;
+                    const excerpt = document.getElementById('news-excerpt').value;
+                    const content = newsContentEditor.innerHTML;
+                    const status = document.getElementById('news-status').value;
+                    
+                    if (!title || !category || !excerpt || !content) {
+                        alert('कृपया सभी आवश्यक फ़ील्ड भरें।');
+                        return;
+                    }
+                    
+                    // लोडिंग स्टेट
+                    const submitBtn = addNewsForm.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> प्रतीक्षा करें...';
+                    submitBtn.disabled = true;
+                    
+                    // मुख्य छवि अपलोड करें
+                    let featuredImageUrl = null;
+                    const imageFile = document.getElementById('news-featured-image').files[0];
+                    
+                    if (imageFile) {
+                        const timestamp = Date.now();
+                        const storageRef = storage.ref(`news-images/${timestamp}_${imageFile.name}`);
+                        await storageRef.put(imageFile);
+                        featuredImageUrl = await storageRef.getDownloadURL();
+                    }
+                    
+                    // टैग्स को array में बदलें
+                    const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+                    
+                    // समाचार डेटा
+                    const newsData = {
+                        title,
+                        slug: slugify(title),
+                        category,
+                        tags,
+                        excerpt,
+                        content,
+                        status,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    if (featuredImageUrl) {
+                        newsData.featuredImage = featuredImageUrl;
+                    }
+                    
+                    const newsId = addNewsForm.dataset.newsId;
+                    
+                    if (newsId) {
+                        // मौजूदा समाचार अपडेट करें
+                        await db.collection('news').doc(newsId).update(newsData);
+                        
+                        // गतिविधि लॉग करें
+                        await db.collection('activities').add({
+                            type: 'update_news',
+                            title: 'समाचार अपडेट किया गया:',
+                            description: title,
+                            time: new Date().toLocaleTimeString('hi-IN'),
+                            icon: 'fa-edit',
+                            iconColor: 'secondary',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        alert('समाचार सफलतापूर्वक अपडेट किया गया!');
+                    } else {
+                        // नया समाचार जोड़ें
+                        newsData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                        
+                        const docRef = await db.collection('news').add(newsData);
+                        
+                        // गतिविधि लॉग करें
+                        await db.collection('activities').add({
+                            type: 'add_news',
+                            title: 'नया समाचार जोड़ा गया:',
+                            description: title,
+                            time: new Date().toLocaleTimeString('hi-IN'),
+                            icon: 'fa-plus',
+                            iconColor: 'primary',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        alert('समाचार सफलतापूर्वक जोड़ा गया!');
+                    }
+                    
+                    // पेज रीसेट और रीडायरेक्ट
+                    addNewsForm.reset();
+                    newsContentEditor.innerHTML = '';
+                    imagePreview.innerHTML = '';
+                    delete addNewsForm.dataset.newsId;
+                    
+                    // डैशबोर्ड और समाचार सूची अपडेट करें
+                    loadDashboardData();
+                    loadNewsData();
+                    
+                    // समाचार प्रबंधन सेक्शन पर जाएं
+                    changeSection('manage-news');
+                } catch (error) {
+                    console.error('Error saving news:', error);
+                    alert('समाचार सहेजने में त्रुटि: ' + error.message);
+                } finally {
+                    // लोडिंग स्टेट रीसेट
+                    const submitBtn = addNewsForm.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> सहेजें और प्रकाशित करें';
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            // अपलोड मीडिया डायलॉग
+            uploadMediaBtn.addEventListener('click', () => {
+                uploadDialog.style.display = 'block';
+                mediaFileInput.value = '';
+                mediaPreview.innerHTML = '';
+                uploadProgress.style.display = 'none';
+            });
+            
+            closeUploadDialogBtn.addEventListener('click', () => {
+                uploadDialog.style.display = 'none';
+            });
+            
+            cancelUploadBtn.addEventListener('click', () => {
+                uploadDialog.style.display = 'none';
+            });
+            
+            // मीडिया अपलोड
+            confirmUploadBtn.addEventListener('click', async () => {
+                const file = mediaFileInput.files[0];
+                
+                if (!file) {
+                    alert('कृपया पहले एक फ़ाइल चुनें।');
+                    return;
+                }
+                
+                try {
+                    // प्रोग्रेस बार दिखाएं
+                    uploadProgress.style.display = 'block';
+                    progressBar.style.width = '0%';
+                    progressPercent.textContent = '0';
+                    
+                    // बटन डिसेबल करें
+                    confirmUploadBtn.disabled = true;
+                    confirmUploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> अपलोड हो रहा है...';
+                    
+                    // फ़ाइल अपलोड करें
+                    const timestamp = Date.now();
+                    const path = `media/${timestamp}_${file.name}`;
+                    const storageRef = storage.ref(path);
+                    
+                    // अपलोड टास्क शुरू करें
+                    const uploadTask = storageRef.put(file);
+                    
+                    // प्रोग्रेस मॉनिटर
+                    uploadTask.on(
+                        'state_changed',
+                        (snapshot) => {
+                            const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                            progressBar.style.width = `${progress}%`;
+                            progressPercent.textContent = progress;
+                        },
+                        (error) => {
+                            throw error;
+                        },
+                        async () => {
+                            // अपलोड पूरा हो गया, URL प्राप्त करें
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            
+                            // मीडिया कलेक्शन में एंट्री जोड़ें
+                            await db.collection('media').add({
+                                name: file.name,
+                                path: path,
+                                url: downloadURL,
+                                type: file.type,
+                                size: file.size,
+                                alt: '',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            
+                            // इंटरफेस अपडेट करें
+                            alert('मीडिया सफलतापूर्वक अपलोड किया गया!');
+                            uploadDialog.style.display = 'none';
+                            loadMediaData();
+                            
+                            // बटन रीसेट करें
+                            confirmUploadBtn.disabled = false;
+                            confirmUploadBtn.innerHTML = '<i class="fas fa-upload"></i> अपलोड करें';
+                        }
+                    );
+                } catch (error) {
+                    console.error('Error uploading media:', error);
+                    alert('मीडिया अपलोड करने में त्रुटि: ' + error.message);
+                    
+                    // बटन रीसेट करें
+                    confirmUploadBtn.disabled = false;
+                    confirmUploadBtn.innerHTML = '<i class="fas fa-upload"></i> अपलोड करें';
+                }
+            });
+            
+            // श्रेणी नाम से स्लग जनरेट करें
+            categoryNameInput.addEventListener('input', () => {
+                categorySlugInput.value = slugify(categoryNameInput.value);
+            });
+            
+            // श्रेणी फॉर्म रीसेट
+            cancelCategoryBtn.addEventListener('click', () => {
+                categoryForm.reset();
+                categoryIdInput.value = '';
+                categoryFormTitle.textContent = 'श्रेणी जोड़ें';
+            });
+            
+            // श्रेणी फॉर्म सबमिशन
+            categoryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                try {
+                    const name = categoryNameInput.value;
+                    const slug = categorySlugInput.value;
+                    const description = categoryDescriptionInput.value;
+                    
+                    if (!name || !slug) {
+                        alert('कृपया श्रेणी का नाम और स्लग दर्ज करें।');
+                        return;
+                    }
+                    
+                    // लोडिंग स्टेट
+                    const submitBtn = categoryForm.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> प्रतीक्षा करें...';
+                    submitBtn.disabled = true;
+                    
+                    const categoryData = {
+                        name,
+                        slug,
+                        description,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    const categoryId = categoryIdInput.value;
+                    
+                    if (categoryId) {
+                        // मौजूदा श्रेणी अपडेट करें
+                        await db.collection('categories').doc(categoryId).update(categoryData);
+                        alert('श्रेणी सफलतापूर्वक अपडेट की गई!');
+                    } else {
+                        // नई श्रेणी जोड़ें
+                        categoryData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                        
+                        const docRef = await db.collection('categories').add(categoryData);
+                        alert('श्रेणी सफलतापूर्वक जोड़ी गई!');
+                    }
+                    
+                    // फॉर्म रीसेट करें
+                    categoryForm.reset();
+                    categoryIdInput.value = '';
+                    categoryFormTitle.textContent = 'श्रेणी जोड़ें';
+                    
+                    // श्रेणी सूची अपडेट करें
+                    loadCategories();
+                } catch (error) {
+                    console.error('Error saving category:', error);
+                    alert('श्रेणी सहेजने में त्रुटि: ' + error.message);
+                } finally {
+                    // लोडिंग स्टेट रीसेट
+                    const submitBtn = categoryForm.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> सहेजें';
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            // सेटिंग्स रीसेट
+            resetSettingsBtn.addEventListener('click', () => {
+                if (confirm('क्या आप वाकई सभी सेटिंग्स को डिफ़ॉल्ट पर रीसेट करना चाहते हैं?')) {
+                    document.getElementById('site-name').value = 'The Bhilai Report';
+                    document.getElementById('site-tagline').value = 'भिलाई की आवाज़';
+                    document.getElementById('site-description').value = 'भिलाई और छत्तीसगढ़ की खबरें सबसे पहले और सबसे विश्वसनीय';
+                    document.getElementById('admin-email').value = 'admin@bhilaireport.com';
+                    document.querySelector('input[name="language"][value="hindi"]').checked = true;
+                    document.getElementById('enable-comments').checked = true;
+                    document.getElementById('moderation-required').checked = true;
+                    document.getElementById('social-sharing').checked = true;
+                }
+            });
+            
+            // सेटिंग्स फॉर्म सबमिशन
+            settingsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                try {
+                    const siteName = document.getElementById('site-name').value;
+                    const siteTagline = document.getElementById('site-tagline').value;
+                    const siteDescription = document.getElementById('site-description').value;
+                    const adminEmail = document.getElementById('admin-email').value;
+                    const language = document.querySelector('input[name="language"]:checked').value;
+                    const enableComments = document.getElementById('enable-comments').checked;
+                    const moderationRequired = document.getElementById('moderation-required').checked;
+                    const socialSharing = document.getElementById('social-sharing').checked;
+                    
+                    // लोडिंग स्टेट
+                    const submitBtn = settingsForm.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> प्रतीक्षा करें...';
+                    submitBtn.disabled = true;
+                    
+                    // सेटिंग्स डेटा
+                    const settingsData = {
+                        siteName,
+                        siteTagline,
+                        siteDescription,
+                        adminEmail,
+                        language,
+                        enableComments,
+                        moderationRequired,
+                        socialSharing,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    // सेटिंग्स अपडेट करें
+                    await db.collection('settings').doc('website').set(settingsData);
+                    
+                    alert('सेटिंग्स सफलतापूर्वक सहेजी गईं!');
+                } catch (error) {
+                    console.error('Error saving settings:', error);
+                    alert('सेटिंग्स सहेजने में त्रुटि: ' + error.message);
+                } finally {
+                    // लोडिंग स्टेट रीसेट
+                    const submitBtn = settingsForm.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> सेटिंग्स सहेजें';
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
