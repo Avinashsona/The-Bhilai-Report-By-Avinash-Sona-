@@ -8,6 +8,40 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
+        /* Made With Avinash_Sona Footer Style */
+.footer-credit {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  transition: transform 0.3s ease;
+}
+.footer-credit:hover {
+  transform: scale(1.05);
+}
+.footer-credit:active {
+  transform: scale(0.95);
+}
+.credit-badge {
+  background: linear-gradient(to right, #3e97ff, #a65fff);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  display: inline-flex;
+  align-items: center;
+  font-weight: bold;
+}
+.credit-badge .heart {
+  margin-left: 8px;
+  color: #ff5a8c;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
         :root {
             --primary: #3e97ff;
             --secondary: #50cd89;
@@ -2289,5 +2323,12 @@
             });
         });
     </script>
+        <!-- फुटर क्रेडिट: Made With Avinash_Sona -->
+<div class="footer-credit">
+    <div class="credit-badge">
+        Made With Avinash_Sona
+        <i class="fas fa-heart heart"></i>
+    </div>
+</div>
 </body>
 </html>
