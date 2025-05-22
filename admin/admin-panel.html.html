@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bhilai Report - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            --primary: #3e97ff;
+            --primary-dark: #2e76cd;
+            --secondary: #50cd89;
+            --destructive: #f1416c;
+            --warning: #ffc700;
+            --background: #ffffff;
+            --foreground: #1e1e1e;
+            --background-dark: #121212;
+            --foreground-dark: #f0f0f0;
+            --card: #ffffff;
+            --card-dark: #1e1e1e;
+            --border: #e2e8f0;
+            --border-dark: #2d3748;
+            --sidebar: #1e1e2d;
+            --sidebar-hover: rgba(62, 151, 255, 0.1);
+            --muted: #f1f5f9;
+            --muted-dark: #2d3748;
+            --muted-foreground: #64748b;
+            --muted-foreground-dark: #a1a1aa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark {
+            background-color: var(--background-dark);
+            color: var(--foreground-dark);
+        }
+        
+        .hidden { display: none !important; }
+        
+        /* Login Screen Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        body.dark .login-card {
+            background-color: var(--card-dark);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-header {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            transition: border-color 0.3s;
+        }
+        
+        body.dark .login-header {
+            border-color: var(--border-dark);
+        }
+        
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .login-logo-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #ff3c3c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-right: 16px;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .login-subtitle {
+            font-size: 15px;
+            color: var(--muted-foreground);
+            transition: color 0.3s;
+        }
+        
+        body.dark .login-subtitle {
+            color: var(--muted-foreground-dark);
+        }
+        
+        .login-content {
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--foreground);
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark .form-control {
+            border-color: var(--border-dark);
+            background-color: var(--background-dark);
+            color: var(--foreground-dark);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .login-alert {
+            background-color: rgba(241, 65, 108, 0.1);
+            color: var(--destructive);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px 16px;
+            background-color: white;
+            color: #333;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.2s, border-color 0.3s;
+            cursor: pointer;
+        }
+        
+        body.dark .btn-google {
+            background-color: var(--background-dark);
+            color: var(--foreground-dark);
+            border-color: var(--border-dark);
+        }
+        
+        .btn-google:hover {
+            background-color: #f9f9f9;
+        }
+        
+        body.dark .btn-google:hover {
+            background-color: var(--muted-dark);
+        }
+        
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted-foreground);
+            background-color: var(--muted);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark .dark-mode-toggle {
+            color: var(--muted-foreground-dark);
+            background-color: var(--muted-dark);
+        }
+        
+        /* Admin Panel Styles */
+        .admin-panel {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            z-index: 100;
+            transition: transform 0.3s;
+            overflow-y: auto;
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            transition: margin-left 0.3s;
+        }
+        
+        .logo {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            background-color: #ff3c3c;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .logo h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .nav-menu {
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #b5b5c3;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--sidebar-hover);
+            color: var(--primary);
+        }
+        
+        .nav-link.active {
+            background-color: var(--sidebar-hover);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .nav-icon {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logout-link {
+            display: flex;
+            align-items: center;
+            color: #b5b5c3;
+            cursor: pointer;
+        }
+        
+        .logout-link:hover {
+            color: var(--primary);
+        }
+        
+        .header {
+            background-color: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        
+        body.dark .header {
+            background-color: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-dark-toggle {
+            padding: 8px;
+            border-radius: 6px;
+            background: none;
+            border: none;
+            color: var(--muted-foreground);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .header-dark-toggle:hover {
+            background-color: var(--muted);
+        }
+        
+        body.dark .header-dark-toggle {
+            color: var(--muted-foreground-dark);
+        }
+        
+        body.dark .header-dark-toggle:hover {
+            background-color: var(--muted-dark);
+        }
+        
+        .content {
+            padding: 24px;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .card {
+            background-color: var(--card);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        body.dark .card {
+            background-color: var(--card-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background-color: var(--card);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        body.dark .stat-card {
+            background-color: var(--card-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--foreground);
+        }
+        
+        body.dark .stat-number {
+            color: var(--foreground-dark);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--muted-foreground);
+        }
+        
+        body.dark .stat-label {
+            color: var(--muted-foreground-dark);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <button class="dark-mode-toggle" id="loginDarkToggle">
+            <i class="fas fa-moon" id="loginDarkIcon"></i>
+        </button>
+        
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <div class="login-logo-icon">TBR</div>
+                    <div>
+                        <h1 class="login-title">The Bhilai Report</h1>
+                        <p class="login-subtitle">Admin Panel में आपका स्वागत है</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="login-content">
+                <div id="loginAlert" class="login-alert"></div>
+                
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="आपका email दर्ज करें" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="आपका password दर्ज करें" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+                        Login करें
+                    </button>
+                </form>
+                
+                <div style="display: flex; align-items: center; margin: 20px 0;">
+                    <div style="flex: 1; height: 1px; background-color: var(--border);"></div>
+                    <span style="padding: 0 16px; font-size: 14px; color: var(--muted-foreground);">या</span>
+                    <div style="flex: 1; height: 1px; background-color: var(--border);"></div>
+                </div>
+                
+                <button class="btn-google" id="googleSignInBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" style="margin-right: 12px;">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Google से sign in करें
+                </button>
+                
+                <p style="font-size: 14px; color: var(--muted-foreground); text-align: center; margin-top: 16px;">
+                    The Bhilai Report के admin panel में login करके आप सभी news articles को manage कर सकते हैं।
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel hidden">
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-img">TBR</div>
+                <h2>The Bhilai Report</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="#" class="nav-link active" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-page="articles">
+                        <i class="fas fa-newspaper nav-icon"></i>
+                        Articles
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-page="categories">
+                        <i class="fas fa-tags nav-icon"></i>
+                        Categories
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-page="users">
+                        <i class="fas fa-users nav-icon"></i>
+                        Users
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-page="analytics">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-page="settings">
+                        <i class="fas fa-cog nav-icon"></i>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="logout-btn">
+                <a href="#" class="logout-link" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt nav-icon"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+        
+        <div class="main-content" id="mainContent">
+            <div class="header">
+                <div class="header-left">
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <button class="header-dark-toggle" id="headerDarkToggle">
+                        <i class="fas fa-moon" id="headerDarkIcon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <!-- Dashboard Content -->
+                <div id="dashboardPage">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: var(--primary);">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Total Articles</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: var(--secondary);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: var(--warning);">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Total Views</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: var(--destructive);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Monthly Growth</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Action Card -->
+                    <div class="card">
+                        <div class="card-title">Quick Actions</div>
+                        <div style="text-align: center; padding: 20px;">
+                            <button class="btn btn-primary" onclick="directlyGoToArticles()" style="font-size: 18px; padding: 15px 30px;">
+                                <i class="fas fa-plus"></i> नया Article लिखें
+                            </button>
+                            <p style="margin-top: 15px; color: var(--muted-foreground);">
+                                तुरंत article लिखना शुरू करें
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Articles Page -->
+                <div id="articlesPage" class="hidden">
+                    <div style="margin-bottom: 24px;">
+                        <h2>Articles Management</h2>
+                        <p style="color: var(--muted-foreground); margin-top: 8px;">अपने सभी articles को manage करें</p>
+                        <button class="btn btn-primary" onclick="showNewArticleForm()" style="margin-top: 15px;">
+                            <i class="fas fa-plus"></i> नया Article लिखें
+                        </button>
+                    </div>
+                    
+                    <!-- New Article Form -->
+                    <div id="newArticleForm" class="card" style="display: none;">
+                        <div class="card-title">नया Article लिखें</div>
+                        <form id="articleForm">
+                            <div class="form-group">
+                                <label for="articleTitle">Article का Title</label>
+                                <input type="text" id="articleTitle" class="form-control" placeholder="Article का title यहाँ लिखें" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="articleCategory">Category</label>
+                                <select id="articleCategory" class="form-control" required>
+                                    <option value="">Category चुनें</option>
+                                    <option value="breaking-news">Breaking News</option>
+                                    <option value="local-news">Local News</option>
+                                    <option value="politics">राजनीति</option>
+                                    <option value="sports">खेल</option>
+                                    <option value="entertainment">मनोरंजन</option>
+                                    <option value="business">बिजनेस</option>
+                                    <option value="technology">तकनीक</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="articleSummary">Article का Summary</label>
+                                <textarea id="articleSummary" class="form-control" rows="3" placeholder="Article का छोटा summary यहाँ लिखें" required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="articleContent">Article का Content</label>
+                                <textarea id="articleContent" class="form-control" rows="10" placeholder="Article का पूरा content यहाँ लिखें" required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="articleImage">Article Image</label>
+                                <div style="margin-bottom: 10px;">
+                                    <input type="file" id="imageUpload" class="form-control" accept="image/*" style="margin-bottom: 10px;">
+                                    <button type="button" onclick="uploadImage()" class="btn" style="background-color: var(--secondary); color: white; margin-bottom: 10px;">
+                                        <i class="fas fa-upload"></i> Image Upload करें
+                                    </button>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <span>या</span>
+                                </div>
+                                <input type="url" id="articleImage" class="form-control" placeholder="https://example.com/image.jpg (Direct URL डालें)">
+                                <div id="imagePreview" style="margin-top: 10px; display: none;">
+                                    <img id="previewImg" style="max-width: 200px; max-height: 150px; border-radius: 5px;" />
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="articleTags">Tags (comma separated)</label>
+                                <input type="text" id="articleTags" class="form-control" placeholder="bhilai, news, local, etc.">
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Article Publish करें
+                                </button>
+                                <button type="button" class="btn" onclick="hideNewArticleForm()" style="margin-left: 10px; background-color: var(--muted); color: var(--foreground);">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Articles List -->
+                    <div class="card">
+                        <div class="card-title">Published Articles</div>
+                        <div id="articlesList">
+                            <p>Articles load हो रहे हैं...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other Pages (Hidden by default) -->
+                <div id="categoriesPage" class="hidden">
+                    <div class="card">
+                        <div class="card-title">Categories Management</div>
+                        <p>Categories management functionality will be implemented here.</p>
+                    </div>
+                </div>
+                
+                <div id="usersPage" class="hidden">
+                    <div class="card">
+                        <div class="card-title">Users Management</div>
+                        <p>Users management functionality will be implemented here.</p>
+                    </div>
+                </div>
+                
+                <div id="analyticsPage" class="hidden">
+                    <div class="card">
+                        <div class="card-title">Analytics Dashboard</div>
+                        <p>Analytics functionality will be implemented here.</p>
+                    </div>
+                </div>
+                
+                <div id="settingsPage" class="hidden">
+                    <div class="card">
+                        <div class="card-title">General Settings</div>
+                        <p>Settings functionality will be implemented here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiA_w2Kb0kvORw-donDDpESZTNZ76Gisg",
+            authDomain: "the-bhilai-report-by-avinash.firebaseapp.com",
+            projectId: "the-bhilai-report-by-avinash",
+            storageBucket: "the-bhilai-report-by-avinash.firebasestorage.app",
+            messagingSenderId: "868804924915",
+            appId: "1:868804924915:web:fabec9ceb993da09a02e86",
+            measurementId: "G-8D1KXYJYCD"
+        };
+
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
+
+        // Initialize Firebase Auth
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Configure Google Auth Provider
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        googleProvider.addScope('email');
+        googleProvider.addScope('profile');
+
+        // Dark Mode Management
+        class DarkModeManager {
+            constructor() {
+                this.isDarkMode = false;
+                this.initializeDarkMode();
+            }
+
+            initializeDarkMode() {
+                const savedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                    this.enableDarkMode();
+                } else {
+                    this.disableDarkMode();
+                }
+
+                this.setupEventListeners();
+                this.updateIcons();
+            }
+
+            setupEventListeners() {
+                const loginDarkToggle = document.getElementById('loginDarkToggle');
+                if (loginDarkToggle) {
+                    loginDarkToggle.addEventListener('click', () => this.toggleDarkMode());
+                }
+
+                const headerDarkToggle = document.getElementById('headerDarkToggle');
+                if (headerDarkToggle) {
+                    headerDarkToggle.addEventListener('click', () => this.toggleDarkMode());
+                }
+            }
+
+            toggleDarkMode() {
+                if (this.isDarkMode) {
+                    this.disableDarkMode();
+                } else {
+                    this.enableDarkMode();
+                }
+            }
+
+            enableDarkMode() {
+                document.body.classList.add('dark');
+                this.isDarkMode = true;
+                localStorage.setItem('theme', 'dark');
+                this.updateIcons();
+                console.log('Dark mode enabled');
+            }
+
+            disableDarkMode() {
+                document.body.classList.remove('dark');
+                this.isDarkMode = false;
+                localStorage.setItem('theme', 'light');
+                this.updateIcons();
+                console.log('Light mode enabled');
+            }
+
+            updateIcons() {
+                const loginIcon = document.getElementById('loginDarkIcon');
+                const headerIcon = document.getElementById('headerDarkIcon');
+
+                if (this.isDarkMode) {
+                    if (loginIcon) loginIcon.className = 'fas fa-sun';
+                    if (headerIcon) headerIcon.className = 'fas fa-sun';
+                } else {
+                    if (loginIcon) loginIcon.className = 'fas fa-moon';
+                    if (headerIcon) headerIcon.className = 'fas fa-moon';
+                }
+            }
+        }
+
+        // Authentication Manager
+        class AuthManager {
+            constructor() {
+                this.currentUser = null;
+                this.initializeAuth();
+            }
+
+            initializeAuth() {
+                auth.onAuthStateChanged((user) => {
+                    this.currentUser = user;
+                    if (user) {
+                        console.log('User is signed in:', user.email);
+                        this.showAdminPanel();
+                    } else {
+                        console.log('User is signed out');
+                        this.showLoginScreen();
+                    }
+                });
+
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                const googleSignInBtn = document.getElementById('googleSignInBtn');
+                if (googleSignInBtn) {
+                    googleSignInBtn.addEventListener('click', () => this.signInWithGoogle());
+                }
+
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', (e) => this.handleEmailLogin(e));
+                }
+
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => this.signOut());
+                }
+            }
+
+            async signInWithGoogle() {
+                try {
+                    this.showLoading('Google से login हो रहा है...');
+                    const result = await auth.signInWithPopup(googleProvider);
+                    const user = result.user;
+                    
+                    console.log('Google sign-in successful:', user.email);
+                    this.hideLoginAlert();
+                    
+                } catch (error) {
+                    console.error('Google sign-in error:', error);
+                    this.showLoginAlert(this.getErrorMessage(error));
+                }
+            }
+
+            async handleEmailLogin(event) {
+                event.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!email || !password) {
+                    this.showLoginAlert('कृपया email और password दोनों भरें');
+                    return;
+                }
+
+                try {
+                    this.showLoading('Login हो रहा है...');
+                    const result = await auth.signInWithEmailAndPassword(email, password);
+                    const user = result.user;
+                    
+                    console.log('Email login successful:', user.email);
+                    this.hideLoginAlert();
+                    
+                } catch (error) {
+                    console.error('Email login error:', error);
+                    this.showLoginAlert(this.getErrorMessage(error));
+                }
+            }
+
+            async signOut() {
+                try {
+                    await auth.signOut();
+                    console.log('User signed out successfully');
+                } catch (error) {
+                    console.error('Sign out error:', error);
+                }
+            }
+
+            showLoginScreen() {
+                const loginScreen = document.getElementById('loginScreen');
+                const adminPanel = document.getElementById('adminPanel');
+                
+                if (loginScreen) loginScreen.classList.remove('hidden');
+                if (adminPanel) adminPanel.classList.add('hidden');
+            }
+
+            showAdminPanel() {
+                const loginScreen = document.getElementById('loginScreen');
+                const adminPanel = document.getElementById('adminPanel');
+                
+                if (loginScreen) loginScreen.classList.add('hidden');
+                if (adminPanel) adminPanel.classList.remove('hidden');
+            }
+
+            showLoginAlert(message) {
+                const alertElement = document.getElementById('loginAlert');
+                if (alertElement) {
+                    alertElement.textContent = message;
+                    alertElement.style.display = 'block';
+                }
+            }
+
+            hideLoginAlert() {
+                const alertElement = document.getElementById('loginAlert');
+                if (alertElement) {
+                    alertElement.style.display = 'none';
+                }
+            }
+
+            showLoading(message) {
+                const googleBtn = document.getElementById('googleSignInBtn');
+                if (googleBtn) {
+                    googleBtn.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>${message}`;
+                    googleBtn.disabled = true;
+                }
+            }
+
+            getErrorMessage(error) {
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        return 'यह email address registered नहीं है';
+                    case 'auth/wrong-password':
+                        return 'गलत password। कृपया फिर से try करें';
+                    case 'auth/invalid-email':
+                        return 'Invalid email address';
+                    case 'auth/user-disabled':
+                        return 'यह account disable है';
+                    case 'auth/too-many-requests':
+                        return 'बहुत सारे attempts। कुछ समय बाद try करें';
+                    case 'auth/network-request-failed':
+                        return 'Network error। Internet connection check करें';
+                    case 'auth/popup-closed-by-user':
+                        return 'Login popup बंद कर दिया गया';
+                    case 'auth/unauthorized-domain':
+                        return 'यह domain authorized नहीं है';
+                    default:
+                        return 'Login में error आई है। कृपया फिर से try करें';
+                }
+            }
+        }
+
+        // Admin Panel Management
+        class AdminPanel {
+            constructor() {
+                this.currentPage = 'dashboard';
+                this.sidebarCollapsed = false;
+                this.initializeAdmin();
+            }
+
+            initializeAdmin() {
+                this.setupEventListeners();
+                this.loadCurrentPage();
+            }
+
+            setupEventListeners() {
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.getAttribute('data-page');
+                        if (page) {
+                            this.navigateToPage(page);
+                        }
+                    });
+                });
+            }
+
+            navigateToPage(page) {
+                const pages = document.querySelectorAll('[id$="Page"]');
+                pages.forEach(pageElement => {
+                    pageElement.classList.add('hidden');
+                });
+
+                const targetPage = document.getElementById(`${page}Page`);
+                if (targetPage) {
+                    targetPage.classList.remove('hidden');
+                }
+
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                const activeLink = document.querySelector(`[data-page="${page}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+
+                this.updatePageTitle(page);
+                this.currentPage = page;
+
+                this.loadPageContent(page);
+            }
+
+            updatePageTitle(page) {
+                const titleElement = document.getElementById('pageTitle');
+                const titles = {
+                    'dashboard': 'Dashboard',
+                    'articles': 'Articles',
+                    'categories': 'Categories',
+                    'users': 'Users',
+                    'analytics': 'Analytics',
+                    'settings': 'Settings'
+                };
+
+                if (titleElement && titles[page]) {
+                    titleElement.textContent = titles[page];
+                }
+            }
+
+            loadPageContent(page) {
+                console.log('Loading page content for:', page);
+                switch (page) {
+                    case 'dashboard':
+                        this.loadDashboardStats();
+                        break;
+                    case 'articles':
+                        console.log('Loading articles page...');
+                        this.loadArticles();
+                        break;
+                }
+            }
+
+            loadDashboardStats() {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                statNumbers.forEach((element, index) => {
+                    const values = ['12', '45', '1,234', '+15%'];
+                    if (values[index]) {
+                        element.textContent = values[index];
+                    }
+                });
+            }
+
+            loadArticles() {
+                console.log('Loading articles...');
+                const articlesListDiv = document.getElementById('articlesList');
+                
+                if (db) {
+                    db.collection('articles')
+                        .orderBy('publishedAt', 'desc')
+                        .get()
+                        .then((querySnapshot) => {
+                            if (querySnapshot.empty) {
+                                articlesListDiv.innerHTML = '<p>अभी तक कोई articles publish नहीं किए गए हैं।</p>';
+                                return;
+                            }
+                            
+                            let articlesHtml = '<div class="articles-grid">';
+                            querySnapshot.forEach((doc) => {
+                                const article = doc.data();
+                                articlesHtml += `
+                                    <div class="article-item" style="border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                                        <h3 style="margin-bottom: 8px; color: var(--primary);">${article.title}</h3>
+                                        <p style="color: var(--muted-foreground); font-size: 14px; margin-bottom: 8px;">
+                                            Category: ${article.category} | Published: ${new Date(article.publishedAt.seconds * 1000).toLocaleDateString('hi-IN')}
+                                        </p>
+                                        <p style="margin-bottom: 12px;">${article.summary}</p>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn btn-primary" onclick="editArticle('${doc.id}')" style="font-size: 12px; padding: 6px 12px;">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button class="btn" onclick="deleteArticle('${doc.id}')" style="font-size: 12px; padding: 6px 12px; background-color: var(--destructive); color: white;">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            articlesHtml += '</div>';
+                            articlesListDiv.innerHTML = articlesHtml;
+                        })
+                        .catch((error) => {
+                            console.error('Error loading articles:', error);
+                            articlesListDiv.innerHTML = '<p>Articles load करने में error आई है।</p>';
+                        });
+                } else {
+                    articlesListDiv.innerHTML = '<p>Firebase connection नहीं है।</p>';
+                }
+            }
+
+            loadCurrentPage() {
+                this.navigateToPage(this.currentPage);
+            }
+        }
+
+        // Article Management Functions
+        function showNewArticleForm() {
+            document.getElementById('newArticleForm').style.display = 'block';
+            document.getElementById('articleTitle').focus();
+        }
+        
+        function directlyGoToArticles() {
+            console.log('Opening articles page...');
+            try {
+                document.querySelectorAll('[id$="Page"]').forEach(page => {
+                    page.classList.add('hidden');
+                });
+                
+                const articlesPage = document.getElementById('articlesPage');
+                if (articlesPage) {
+                    articlesPage.classList.remove('hidden');
+                    console.log('Articles page is now visible');
+                }
+                
+                const pageTitle = document.getElementById('pageTitle');
+                if (pageTitle) {
+                    pageTitle.textContent = 'Articles';
+                }
+                
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                const articlesNavLink = document.querySelector('[data-page="articles"]');
+                if (articlesNavLink) {
+                    articlesNavLink.classList.add('active');
+                }
+                
+                setTimeout(() => {
+                    showNewArticleForm();
+                }, 300);
+                
+            } catch (error) {
+                console.error('Error opening articles page:', error);
+                alert('Article page खोलने में error आई है');
+            }
+        }
+        
+        function hideNewArticleForm() {
+            document.getElementById('newArticleForm').style.display = 'none';
+            document.getElementById('articleForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+        
+        function uploadImage() {
+            const fileInput = document.getElementById('imageUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('कृपया पहले image select करें!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                document.getElementById('articleImage').value = imageUrl;
+                
+                const preview = document.getElementById('imagePreview');
+                const previewImg = document.getElementById('previewImg');
+                previewImg.src = imageUrl;
+                previewImg.style.display = 'block';
+                preview.style.display = 'block';
+                
+                console.log('Image uploaded and preview shown');
+                alert('Image successfully upload हो गई! 📸\nPreview नीचे दिख रहा होगा।');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function publishArticle() {
+            const title = document.getElementById('articleTitle').value;
+            const category = document.getElementById('articleCategory').value;
+            const summary = document.getElementById('articleSummary').value;
+            const content = document.getElementById('articleContent').value;
+            const imageUrl = document.getElementById('articleImage').value;
+            const tagsInput = document.getElementById('articleTags').value;
+            
+            if (!title || !category || !summary || !content) {
+                alert('कृपया सभी required fields भरें!');
+                return;
+            }
+            
+            const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [];
+            
+            const article = {
+                title: title,
+                category: category,
+                summary: summary,
+                content: content,
+                imageUrl: imageUrl || '',
+                tags: tags,
+                author: window.authManager && window.authManager.currentUser ? window.authManager.currentUser.email : 'admin',
+                publishedAt: firebase.firestore.Timestamp.now(),
+                updatedAt: firebase.firestore.Timestamp.now(),
+                status: 'published',
+                views: 0
+            };
+            
+            const submitBtn = document.querySelector('#articleForm button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+            submitBtn.disabled = true;
+            
+            if (db) {
+                db.collection('articles').add(article)
+                    .then((docRef) => {
+                        console.log('Article published with ID: ', docRef.id);
+                        alert('आपका article successfully publish हो गया है! 🎉');
+                        hideNewArticleForm();
+                        
+                        if (window.adminPanel) {
+                            window.adminPanel.loadArticles();
+                        }
+                        
+                        document.getElementById('articleForm').reset();
+                    })
+                    .catch((error) => {
+                        console.error('Error publishing article: ', error);
+                        alert('Article publish करने में error आई है: ' + error.message);
+                    })
+                    .finally(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    });
+            } else {
+                alert('Firebase database connection नहीं है! कृपया page refresh करें।');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+        
+        function editArticle(articleId) {
+            console.log('Editing article:', articleId);
+            alert('Edit functionality coming soon!');
+        }
+        
+        function deleteArticle(articleId) {
+            if (confirm('क्या आप sure हैं कि आप इस article को delete करना चाहते हैं?')) {
+                if (db) {
+                    db.collection('articles').doc(articleId).delete()
+                        .then(() => {
+                            console.log('Article deleted successfully');
+                            alert('Article successfully delete हो गया है!');
+                            
+                            if (window.adminPanel) {
+                                window.adminPanel.loadArticles();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error deleting article: ', error);
+                            alert('Article delete करने में error आई है: ' + error.message);
+                        });
+                } else {
+                    alert('Firebase database connection नहीं है!');
+                }
+            }
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.darkModeManager = new DarkModeManager();
+            window.authManager = new AuthManager();
+            
+            // Handle article form submission
+            const articleForm = document.getElementById('articleForm');
+            if (articleForm) {
+                articleForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    publishArticle();
+                });
+            }
+        });
+
+        // Initialize when admin panel becomes visible
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const adminPanel = document.getElementById('adminPanel');
+                    if (adminPanel && !adminPanel.classList.contains('hidden') && !window.adminPanel) {
+                        window.adminPanel = new AdminPanel();
+                    }
+                }
+            });
+        });
+
+        const adminPanelElement = document.getElementById('adminPanel');
+        if (adminPanelElement) {
+            observer.observe(adminPanelElement, { attributes: true });
+        }
+    </script>
+</body>
+</html>
