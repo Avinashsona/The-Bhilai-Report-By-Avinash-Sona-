@@ -1292,5 +1292,77 @@
             navList.classList.toggle('show-mobile');
         });
     </script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDiA_w2Kb0kvORw-donDDpESZTNZ76Gisg",
+  authDomain: "the-bhilai-report-by-avinash.firebaseapp.com",
+  projectId: "the-bhilai-report-by-avinash"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let currentIndex = 0;
+let slidesData = [];
+
+function renderSlider() {
+  const wrapper = document.getElementById('slider-wrapper');
+  const dotsContainer = document.getElementById('dots-container');
+  wrapper.innerHTML = '';
+  dotsContainer.innerHTML = '';
+
+  slidesData.forEach((news, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.innerHTML = `
+      <a href="news.html?id=${news.id}">
+        <img src="${news.imageUrl}" alt="">
+        <div class="main-title">${news.title}</div>
+        <div class="sub-text">${getTimeAgo(news.publishedAt)} | ${news.title}</div>
+      </a>`;
+    wrapper.appendChild(slide);
+
+    const dot = document.createElement('span');
+    dot.addEventListener('click', () => showSlide(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  showSlide(currentIndex);
+}
+
+function showSlide(i) {
+  currentIndex = (i + slidesData.length) % slidesData.length;
+  document.getElementById('slider-wrapper').style.transform = `translateX(-${currentIndex * 100}%)`;
+  document.querySelectorAll('.dots span').forEach((d, idx) => {
+    d.className = idx === currentIndex ? 'active' : '';
+  });
+}
+
+function nextSlide() { showSlide(currentIndex + 1); }
+function prevSlide() { showSlide(currentIndex - 1); }
+
+setInterval(() => { nextSlide(); }, 5000);
+
+function getTimeAgo(ts) {
+  const now = Date.now();
+  const diff = Math.floor((now - ts) / 1000);
+  if (diff < 60) return `${diff} sec ago`;
+  if (diff < 3600) return `${Math.floor(diff/60)} min ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)} hr ago`;
+  return `${Math.floor(diff/86400)} days ago`;
+}
+
+window.addEventListener("load", () => {
+  db.collection("published_news")
+    .orderBy("publishedAt", "desc")
+    .limit(5)
+    .get()
+    .then(snapshot => {
+      slidesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderSlider();
+    });
+});
+</script>
 </body>
 </html>
