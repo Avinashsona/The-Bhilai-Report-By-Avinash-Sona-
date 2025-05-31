@@ -1352,6 +1352,7 @@ function getTimeAgo(ts) {
 }
 
 window.addEventListener("load", () => {
+    const db = firebase.firestore();
   db.collection("articles")
   .where("status", "==", "published")
     .orderBy("publishedAt", "desc")
