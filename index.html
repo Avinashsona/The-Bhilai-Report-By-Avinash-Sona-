@@ -1,14 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="5ExDR6YMQCJ1rGxs4AEf9c8PHD-tPuG3eqCVoAIq-kc" />
-    <title>The Bhilai Report by Avinash Sona</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="ka stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="5ExDR6YMQCJ1rGxs4AEf9c8PHD-tPuG3eqCVoAIq-kc" name="google-site-verification">
+<title>The Bhilai Report by Avinash Sona</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="ka stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
         /* Base Styles */
         * {
             margin: 0;
@@ -665,11 +666,83 @@
             100% { transform: rotate(360deg); }
         }
     </style>
-</head>
+</meta><style>
+.slider-container {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
+.slider-wrapper {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+.slide {
+  min-width: 100%;
+  position: relative;
+  color: white;
+}
+.slide img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  filter: brightness(60%);
+}
+.main-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+.sub-text {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  color: black;
+  padding: 10px 15px;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 24px;
+  border: none;
+  transition: 0.3s;
+}
+.nav-button:hover {
+  color: red;
+  background-color: #eee;
+}
+.prev { left: 10px; }
+.next { right: 10px; }
+.dots {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+}
+.dots span {
+  height: 10px;
+  width: 10px;
+  margin: 0 5px;
+  background-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+}
+.dots .active { background-color: red; }
+</style></head>
 <body>
-    <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+<div class="tradingview-widget-container">
+<div class="tradingview-widget-container__widget"></div>
+<script async="" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" type="text/javascript">
         {
             "symbols": [
                 {
@@ -699,287 +772,195 @@
             "locale": "in"
         }
         </script>
-    </div>
-    
-    <div class="top-bar">
-        <div class="container">
-            <div class="date-time">
-                <span id="current-date"></span> | <span id="current-time"></span>
-            </div>
-            <div class="social-links">
-                <a href="https://m.facebook.com/Whimsicalavi01" target="_blank"><i class="fab fa-facebook"></i></a>
-                <a href="https://x.com/Arjun6790" target="_blank"><i class="fab fa-x-twitter"></i></a>
-                <a href="https://www.instagram.com/iamavinash_0007" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.youtube.com/channel/UCde24KDyxKEe8bIbmtAgkUw" target="_blank"><i class="fab fa-youtube"></i></a>
-            </div>
-        </div>
-    </div>
-
-    <header>
-        <div class="container">
-            <div class="logo">
-                <img src="bhilai-report-logo.png" alt="The Bhilai Report">
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="समाचार खोजें...">
-                <button><i class="fas fa-search"></i></button>
-            </div>
-            <div class="right-menu">
-                <div class="language-toggle">
-                    <button id="lang-toggle" class="active">हिंदी</button>
-                    <button id="lang-toggle-en">English</button>
-                </div>
-                <div class="mobile-menu-toggle">
-                    <button id="menu-toggle"><i class="fas fa-bars"></i></button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <nav class="main-nav">
-        <div class="container">
-            <ul class="nav-list">
-                <li><a href="#" class="active" onclick="filterNews('all')">होम</a></li>
-                <li><a href="#" onclick="filterNews('bhilai')">भिलाई</a></li>
-                <li><a href="#" onclick="filterNews('chhattisgarh')">छत्तीसगढ़</a></li>
-                <li><a href="#" onclick="filterNews('desh')">देश</a></li>
-                <li><a href="#" onclick="filterNews('duniya')">दुनिया</a></li>
-                <li><a href="#" onclick="filterNews('khel')">खेल</a></li>
-                <li><a href="#" onclick="filterNews('business')">बिज़नेस</a></li>
-                <li><a href="#" onclick="filterNews('manoranjan')">मनोरंजन</a></li>
-                <li><a href="#" onclick="filterNews('technology')">टेक्नोलॉजी</a></li>
-                <li><a href="#" onclick="filterNews('lifestyle')">लाइफस्टाइल</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="breaking-news">
-        <div class="container">
-            <div class="breaking-label">ब्रेकिंग न्यूज़</div>
-            <div class="breaking-news-slider">
-                <div class="breaking-news-items" id="breaking-news-container">
-                    <p>ताज़ा खबरों के लिए लोड हो रहा है...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <main class="main-content">
-        <div class="container">
-            <div class="content-grid">
-                <div class="main-news-section">
-                    <!-- 🔁 Firebase Dynamic Slider Start -->
+</div>
+<div class="top-bar">
+<div class="container">
+<div class="date-time">
+<span id="current-date"></span> | <span id="current-time"></span>
+</div>
+<div class="social-links">
+<a href="https://m.facebook.com/Whimsicalavi01" target="_blank"><i class="fab fa-facebook"></i></a>
+<a href="https://x.com/Arjun6790" target="_blank"><i class="fab fa-x-twitter"></i></a>
+<a href="https://www.instagram.com/iamavinash_0007" target="_blank"><i class="fab fa-instagram"></i></a>
+<a href="https://www.youtube.com/channel/UCde24KDyxKEe8bIbmtAgkUw" target="_blank"><i class="fab fa-youtube"></i></a>
+</div>
+</div>
+</div>
+<header>
+<div class="container">
+<div class="logo">
+<img alt="The Bhilai Report" src="bhilai-report-logo.png"/>
+</div>
+<div class="search-bar">
+<input placeholder="समाचार खोजें..." type="text"/>
+<button><i class="fas fa-search"></i></button>
+</div>
+<div class="right-menu">
+<div class="language-toggle">
+<button class="active" id="lang-toggle">हिंदी</button>
+<button id="lang-toggle-en">English</button>
+</div>
+<div class="mobile-menu-toggle">
+<button id="menu-toggle"><i class="fas fa-bars"></i></button>
+</div>
+</div>
+</div>
+</header>
+<nav class="main-nav">
+<div class="container">
+<ul class="nav-list">
+<li><a class="active" href="#" onclick="filterNews('all')">होम</a></li>
+<li><a href="#" onclick="filterNews('bhilai')">भिलाई</a></li>
+<li><a href="#" onclick="filterNews('chhattisgarh')">छत्तीसगढ़</a></li>
+<li><a href="#" onclick="filterNews('desh')">देश</a></li>
+<li><a href="#" onclick="filterNews('duniya')">दुनिया</a></li>
+<li><a href="#" onclick="filterNews('khel')">खेल</a></li>
+<li><a href="#" onclick="filterNews('business')">बिज़नेस</a></li>
+<li><a href="#" onclick="filterNews('manoranjan')">मनोरंजन</a></li>
+<li><a href="#" onclick="filterNews('technology')">टेक्नोलॉजी</a></li>
+<li><a href="#" onclick="filterNews('lifestyle')">लाइफस्टाइल</a></li>
+</ul>
+</div>
+</nav>
+<div class="breaking-news">
+<div class="container">
+<div class="breaking-label">ब्रेकिंग न्यूज़</div>
+<div class="breaking-news-slider">
+<div class="breaking-news-items" id="breaking-news-container">
+<p>ताज़ा खबरों के लिए लोड हो रहा है...</p>
+</div>
+</div>
+</div>
+</div>
+<main class="main-content">
+<div class="container">
+<div class="content-grid">
+<div class="main-news-section">
+<!-- 🔁 Firebase Dynamic Slider Start -->
 <div class="slider-container" style="margin-bottom: 30px;">
-  <div class="slider-wrapper" id="slider-wrapper"></div>
-  <button class="nav-button prev" onclick="prevSlide()">❮</button>
-  <button class="nav-button next" onclick="nextSlide()">❯</button>
-  <div class="dots" id="dots-container"></div>
+<div class="slider-wrapper" id="slider-wrapper"></div>
+<button class="nav-button prev" onclick="prevSlide()">❮</button>
+<button class="nav-button next" onclick="nextSlide()">❯</button>
+<div class="dots" id="dots-container"></div>
 </div>
 
-<style>
-  .slider-container {
-    position: relative;
-    max-width: 100%;
-    overflow: hidden;
-  }
-  .slider-wrapper {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-  }
-  .slide {
-    min-width: 100%;
-    position: relative;
-    color: white;
-  }
-  .slide img {
-    width: 100%;
-    height: 500px;
-    object-fit: cover;
-    filter: brightness(60%);
-  }
-  .main-title {
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 30px;
-    font-weight: bold;
-    text-align: center;
-  }
-  .sub-text {
-    position: absolute;
-    bottom: 20px;
-    left: 30px;
-    font-size: 16px;
-    opacity: 0.9;
-  }
-  .nav-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(255,255,255,0.7);
-    color: black;
-    padding: 10px 15px;
-    cursor: pointer;
-    z-index: 10;
-    font-size: 24px;
-    border: none;
-    border-radius: 50%;
-    transition: 0.3s;
-  }
-  .nav-button:hover {
-    background-color: red;
-    color: white;
-  }
-  .prev { left: 10px; }
-  .next { right: 10px; }
-  .dots {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-  }
-  .dots span {
-    height: 12px;
-    width: 12px;
-    margin: 0 5px;
-    background-color: white;
-    border-radius: 50%;
-    display: inline-block;
-    cursor: pointer;
-  }
-  .dots .active {
-    background-color: red;
-  }
-</style>
-                    <!-- Featured News -->
-                    <div class="featured-news" id="featured-news-container">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </div>
-
-                    <!-- News Grid -->
-                    <div class="news-grid" id="news-grid-container">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <aside class="sidebar">
-                    <!-- Trending Widget -->
-                    <div class="widget trending-widget">
-                        <h4 class="widget-title">ट्रेंडिंग न्यूज़</h4>
-                        <ul class="trending-list" id="trending-news-container">
-                            <li><div class="loading-spinner"></div></li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Ad Widget -->
-                    <div class="widget ad-widget">
-                        <h4 class="widget-title">विज्ञापन</h4>
-                        <img src="https://via.placeholder.com/300x250?text=Advertisement" alt="Advertisement">
-                    </div>
-                    
-                    <!-- Social Widget -->
-                    <div class="widget social-widget">
-                        <h4 class="widget-title">हमसे जुड़ें</h4>
-                        <div class="social-buttons">
-                            <a href="https://m.facebook.com/Whimsicalavi01" class="social-btn facebook-btn" target="_blank">
-                                <i class="fab fa-facebook-f"></i> Facebook
+<!-- Featured News -->
+<div class="featured-news" id="featured-news-container">
+<div class="loading">
+<div class="loading-spinner"></div>
+</div>
+</div>
+<!-- News Grid -->
+<div class="news-grid" id="news-grid-container">
+<div class="loading">
+<div class="loading-spinner"></div>
+</div>
+</div>
+</div>
+<aside class="sidebar">
+<!-- Trending Widget -->
+<div class="widget trending-widget">
+<h4 class="widget-title">ट्रेंडिंग न्यूज़</h4>
+<ul class="trending-list" id="trending-news-container">
+<li><div class="loading-spinner"></div></li>
+</ul>
+</div>
+<!-- Ad Widget -->
+<div class="widget ad-widget">
+<h4 class="widget-title">विज्ञापन</h4>
+<img alt="Advertisement" src="https://via.placeholder.com/300x250?text=Advertisement"/>
+</div>
+<!-- Social Widget -->
+<div class="widget social-widget">
+<h4 class="widget-title">हमसे जुड़ें</h4>
+<div class="social-buttons">
+<a class="social-btn facebook-btn" href="https://m.facebook.com/Whimsicalavi01" target="_blank">
+<i class="fab fa-facebook-f"></i> Facebook
                             </a>
-                            <a href="https://x.com/Arjun6790" class="social-btn twitter-btn" target="_blank">
-                                <i class="fab fa-twitter"></i> Twitter
+<a class="social-btn twitter-btn" href="https://x.com/Arjun6790" target="_blank">
+<i class="fab fa-twitter"></i> Twitter
                             </a>
-                            <a href="https://www.youtube.com/channel/UCde24KDyxKEe8bIbmtAgkUw" class="social-btn youtube-btn" target="_blank">
-                                <i class="fab fa-youtube"></i> YouTube
+<a class="social-btn youtube-btn" href="https://www.youtube.com/channel/UCde24KDyxKEe8bIbmtAgkUw" target="_blank">
+<i class="fab fa-youtube"></i> YouTube
                             </a>
-                            <a href="https://www.instagram.com/iamavinash_0007" class="social-btn instagram-btn" target="_blank">
-                                <i class="fab fa-instagram"></i> Instagram
+<a class="social-btn instagram-btn" href="https://www.instagram.com/iamavinash_0007" target="_blank">
+<i class="fab fa-instagram"></i> Instagram
                             </a>
-                            <a href="#" class="social-btn telegram-btn" target="_blank">
-                                <i class="fab fa-telegram-plane"></i> Telegram
+<a class="social-btn telegram-btn" href="#" target="_blank">
+<i class="fab fa-telegram-plane"></i> Telegram
                             </a>
-                            <a href="#" class="social-btn whatsapp-btn" target="_blank">
-                                <i class="fab fa-whatsapp"></i> WhatsApp
+<a class="social-btn whatsapp-btn" href="#" target="_blank">
+<i class="fab fa-whatsapp"></i> WhatsApp
                             </a>
-                        </div>
-                    </div>
-                </aside>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<footer>
+<div class="container">
+<div class="footer-grid">
+<div class="footer-about">
+<div class="footer-logo">
+<img alt="The Bhilai Report" src="bhilai-report-logo.png"/>
+</div>
+<p>The Bhilai Report भिलाई और छत्तीसगढ़ की ताज़ा खबरें आप तक पहुंचाता है। हमारा मिशन आपको सच्ची और विश्वसनीय खबरें देना है।</p>
+<div class="footer-social">
+<a href="https://m.facebook.com/Whimsicalavi01" target="_blank"><i class="fab fa-facebook-f"></i></a>
+<a href="https://x.com/Arjun6790" target="_blank"><i class="fab fa-twitter"></i></a>
+<a href="https://www.instagram.com/iamavinash_0007" target="_blank"><i class="fab fa-instagram"></i></a>
+<a href="https://www.youtube.com/channel/UCde24KDyxKEe8bIbmtAgkUw" target="_blank"><i class="fab fa-youtube"></i></a>
+</div>
+</div>
+<div class="footer-links">
+<h3 class="footer-title">उपयोगी लिंक्स</h3>
+<ul>
+<li><a href="admin-panel.html">Admin Panel</a></li>
+<li><a href="#">हमारे बारे में</a></li>
+<li><a href="#">प्राइवेसी पॉलिसी</a></li>
+<li><a href="#">टर्म्स और कंडीशन्स</a></li>
+<li><a href="#">विज्ञापन</a></li>
+</ul>
+</div>
+<div class="footer-links">
+<h3 class="footer-title">श्रेणियाँ</h3>
+<ul>
+<li><a href="#" onclick="filterNews('bhilai')">भिलाई</a></li>
+<li><a href="#" onclick="filterNews('chhattisgarh')">छत्तीसगढ़</a></li>
+<li><a href="#" onclick="filterNews('desh')">देश</a></li>
+<li><a href="#" onclick="filterNews('khel')">खेल</a></li>
+<li><a href="#" onclick="filterNews('business')">बिज़नेस</a></li>
+</ul>
+</div>
+<div class="footer-contact">
+<h3 class="footer-title">संपर्क करें</h3>
+<ul>
+<li>
+<i class="fas fa-map-marker-alt"></i>
+<span>भिलाई, छत्तीसगढ़, भारत</span>
+</li>
+<li>
+<i class="fas fa-envelope"></i>
+<span>avinashsona19@gmail.com</span>
+</li>
+<li>
+<i class="fas fa-phone"></i>
+<span>+91 9999999999</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="copyright">
+                © 2024 The Bhilai Report by Avinash Sona. सर्वाधिकार सुरक्षित।
             </div>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <div class="footer-logo">
-                        <img src="bhilai-report-logo.png" alt="The Bhilai Report">
-                    </div>
-                    <p>The Bhilai Report भिलाई और छत्तीसगढ़ की ताज़ा खबरें आप तक पहुंचाता है। हमारा मिशन आपको सच्ची और विश्वसनीय खबरें देना है।</p>
-                    <div class="footer-social">
-                        <a href="https://m.facebook.com/Whimsicalavi01" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://x.com/Arjun6790" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <a href="https://www.instagram.com/iamavinash_0007" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.youtube.com/channel/UCde24KDyxKEe8bIbmtAgkUw" target="_blank"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <h3 class="footer-title">उपयोगी लिंक्स</h3>
-                    <ul>
-                        <li><a href="admin-panel.html">Admin Panel</a></li>
-                        <li><a href="#">हमारे बारे में</a></li>
-                        <li><a href="#">प्राइवेसी पॉलिसी</a></li>
-                        <li><a href="#">टर्म्स और कंडीशन्स</a></li>
-                        <li><a href="#">विज्ञापन</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h3 class="footer-title">श्रेणियाँ</h3>
-                    <ul>
-                        <li><a href="#" onclick="filterNews('bhilai')">भिलाई</a></li>
-                        <li><a href="#" onclick="filterNews('chhattisgarh')">छत्तीसगढ़</a></li>
-                        <li><a href="#" onclick="filterNews('desh')">देश</a></li>
-                        <li><a href="#" onclick="filterNews('khel')">खेल</a></li>
-                        <li><a href="#" onclick="filterNews('business')">बिज़नेस</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-contact">
-                    <h3 class="footer-title">संपर्क करें</h3>
-                    <ul>
-                        <li>
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>भिलाई, छत्तीसगढ़, भारत</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-envelope"></i>
-                            <span>avinashsona19@gmail.com</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-phone"></i>
-                            <span>+91 9999999999</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                &copy; 2024 The Bhilai Report by Avinash Sona. सर्वाधिकार सुरक्षित।
-            </div>
-        </div>
-    </footer>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-
-    <script>
+</div>
+</footer>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+<script>
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDiA_w2Kb0kvORw-donDDpESZTNZ76Gisg",
@@ -1292,14 +1273,17 @@
             navList.classList.toggle('show-mobile');
         });
     </script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyDiA_w2Kb0kvORw-donDDpESZTNZ76Gisg",
+  apiKey: "AIzaSyC8sAsuoz32gKqLIKrWAxodNfqeQViMVng",
   authDomain: "the-bhilai-report-by-avinash.firebaseapp.com",
   projectId: "the-bhilai-report-by-avinash"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 let currentIndex = 0;
 let slidesData = [];
@@ -1315,7 +1299,7 @@ function renderSlider() {
     slide.className = 'slide';
     slide.innerHTML = `
       <a href="news.html?id=${news.id}">
-        <img src="${news.imageUrl}" alt="">
+        <img src="${news.imageUrl}" alt="News">
         <div class="main-title">${news.title}</div>
         <div class="sub-text">${getTimeAgo(news.publishedAt)} | ${news.title}</div>
       </a>`;
@@ -1339,10 +1323,10 @@ function showSlide(i) {
 
 function nextSlide() { showSlide(currentIndex + 1); }
 function prevSlide() { showSlide(currentIndex - 1); }
-
 setInterval(() => { nextSlide(); }, 5000);
 
 function getTimeAgo(ts) {
+  if (!ts) return '';
   const now = Date.now();
   const diff = Math.floor((now - ts) / 1000);
   if (diff < 60) return `${diff} sec ago`;
@@ -1352,17 +1336,16 @@ function getTimeAgo(ts) {
 }
 
 window.addEventListener("load", () => {
-    const db = firebase.firestore();
   db.collection("articles")
-  .where("status", "==", "published")
+    .where("status", "==", "published")
     .orderBy("publishedAt", "desc")
     .limit(5)
     .get()
     .then(snapshot => {
       slidesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       renderSlider();
-    });
+    })
+    .catch(err => console.error('Slider Load Error:', err));
 });
-</script>
-</body>
+</script></body>
 </html>
