@@ -1352,7 +1352,8 @@ function getTimeAgo(ts) {
 }
 
 window.addEventListener("load", () => {
-  db.collection("published_news")
+  db.collection("articles")
+  .where("status", "==", "published")
     .orderBy("publishedAt", "desc")
     .limit(5)
     .get()
