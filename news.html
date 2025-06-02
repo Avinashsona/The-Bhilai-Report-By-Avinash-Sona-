@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bhilai Report By Avinash Sona - Latest News</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary-red: #CC0000;
+            --dark-red: #A00000;
+            --light-red: #FFE6E6;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --background-light: #F8F9FA;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--background-light);
+        }
+
+        /* Header Styles */
+        .header-section {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            background: white;
+        }
+
+        .brand-title {
+            color: var(--primary-red);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-dark);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-red);
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0;
+        }
+
+        .section-title {
+            color: var(--primary-red);
+            font-weight: bold;
+            border-bottom: 3px solid var(--primary-red);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* News Article Cards */
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .news-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .news-content {
+            padding: 1.5rem;
+        }
+
+        .news-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .news-title:hover {
+            color: var(--primary-red);
+            cursor: pointer;
+        }
+
+        .news-excerpt {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .news-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-red), var(--dark-red));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .author-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .publish-date {
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .share-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .share-btn.facebook {
+            background-color: #1877f2;
+            color: white;
+        }
+
+        .share-btn.whatsapp {
+            background-color: #25d366;
+            color: white;
+        }
+
+        .share-btn.twitter {
+            background-color: #1da1f2;
+            color: white;
+        }
+
+        .share-btn.copy {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        /* Advertisement Blocks */
+        .ad-block {
+            background: linear-gradient(135deg, var(--light-red), #fff);
+            border: 2px solid var(--primary-red);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-block::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(204, 0, 0, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .ad-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .ad-title {
+            color: var(--primary-red);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .ad-description {
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .ad-cta {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .ad-cta:hover {
+            background-color: var(--dark-red);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.3);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .whatsapp-section .card {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Floating WhatsApp Button */
+        .floating-whatsapp {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .whatsapp-float-btn {
+            background: linear-gradient(45deg, #25d366, #128c7e);
+            color: white;
+            padding: 1rem;
+            border-radius: 50px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .whatsapp-float-btn:hover {
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-float-btn i {
+            font-size: 1.5rem;
+        }
+
+        .whatsapp-text {
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Footer Styles */
+        .footer-section {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: white;
+            margin-top: 3rem;
+        }
+
+        .footer-section .social-links a {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .footer-section .social-links a:hover {
+            transform: translateY(-3px);
+            color: #fff !important;
+        }
+
+        /* Logo SVG */
+        .logo-svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .floating-whatsapp {
+                right: 15px;
+                bottom: 20px;
+                top: auto;
+                transform: none;
+            }
+            
+            .whatsapp-float-btn {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                padding: 0;
+                justify-content: center;
+            }
+            
+            .whatsapp-text {
+                display: none;
+            }
+            
+            .news-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .share-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .ad-block {
+                padding: 1.5rem;
+            }
+            
+            .main-content {
+                padding: 1rem 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .brand-title {
+                font-size: 1.2rem;
+            }
+            
+            .news-title {
+                font-size: 1.2rem;
+            }
+            
+            .ad-title {
+                font-size: 1.3rem;
+            }
+            
+            .share-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Loading and Error States */
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        #error-message {
+            border-radius: 12px;
+        }
+
+        #no-articles {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .news-card {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-red);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-red);
+        }
+
+        /* Toast animations */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-section">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <svg class="logo-svg me-3" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#CC0000;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#A00000;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="shadow">
+                                <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.3"/>
+                            </filter>
+                        </defs>
+                        <!-- Logo background shape -->
+                        <path d="M10 15 Q10 5 20 5 L100 5 Q110 5 110 15 L108 55 Q108 65 100 65 L20 65 Q10 65 10 55 Z" fill="url(#logoGradient)" stroke="#800000" stroke-width="1" filter="url(#shadow)"/>
+                        <path d="M8 13 Q8 3 18 3 L98 3 Q108 3 108 13 L106 53 Q106 63 98 63 L18 63 Q8 63 8 53 Z" fill="#ffffff" opacity="0.1"/>
+                        
+                        <!-- Text: THE BHILAI REPORT -->
+                        <text x="60" y="25" text-anchor="middle" fill="white" font-family="Arial Black, sans-serif" font-size="11" font-weight="900">THE BHILAI</text>
+                        <text x="60" y="38" text-anchor="middle" fill="white" font-family="Arial Black, sans-serif" font-size="11" font-weight="900">REPORT</text>
+                        
+                        <!-- Text: BY AVINASH SONA -->
+                        <text x="60" y="52" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" font-weight="bold">BY AVINASH SONA</text>
+                        
+                        <!-- Decorative elements -->
+                        <circle cx="20" cy="20" r="1.5" fill="white" opacity="0.6"/>
+                        <circle cx="100" cy="20" r="1.5" fill="white" opacity="0.6"/>
+                        <circle cx="20" cy="50" r="1.5" fill="white" opacity="0.6"/>
+                        <circle cx="100" cy="50" r="1.5" fill="white" opacity="0.6"/>
+                    </svg>
+                    <div>
+                        <h4 class="mb-0 brand-title">THE BHILAI REPORT</h4>
+                        <small class="text-muted">BY AVINASH SONA</small>
+                    </div>
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#news">News</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contact">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- News Articles Section -->
+                <div class="col-lg-9 col-md-8">
+                    <div class="news-section p-4">
+                        <h2 class="section-title mb-4">Latest News</h2>
+                        
+                        <!-- Loading Spinner -->
+                        <div id="loading" class="text-center py-5">
+                            <div class="spinner-border text-danger" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading latest news...</p>
+                        </div>
+                        
+                        <!-- Error Message -->
+                        <div id="error-message" class="alert alert-danger d-none" role="alert">
+                            <h4 class="alert-heading">Unable to Load News</h4>
+                            <p>We're experiencing technical difficulties loading the latest news. Please check your internet connection and try again.</p>
+                            <hr>
+                            <button class="btn btn-outline-danger" onclick="loadNews()">
+                                <i class="fas fa-retry"></i> Retry
+                            </button>
+                        </div>
+                        
+                        <!-- News Articles Container -->
+                        <div id="news-container" class="news-container">
+                            <!-- Articles will be dynamically loaded here -->
+                        </div>
+                        
+                        <!-- No Articles Message -->
+                        <div id="no-articles" class="text-center py-5 d-none">
+                            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Articles Available</h4>
+                            <p class="text-muted">Check back later for the latest news updates.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Sidebar -->
+                <div class="col-lg-3 col-md-4">
+                    <div class="sidebar p-4">
+                        <!-- WhatsApp Channel Button -->
+                        <div class="whatsapp-section mb-4">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="fab fa-whatsapp fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">समाचार अपडेट पाएं</h5>
+                                    <p class="card-text">व्हाट्सऐप चैनल से जुड़ें और तुरंत समाचार अपडेट पाएं</p>
+                                    <a href="https://whatsapp.com/channel/0029VaGK3VoAhY2UeTcaHSAn" 
+                                       target="_blank" 
+                                       class="btn btn-success btn-lg">
+                                        <i class="fab fa-whatsapp me-2"></i>
+                                        चैनल से जुड़ें
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- About Section -->
+                        <div class="about-section">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">About The Bhilai Report</h5>
+                                    <p class="card-text">Your trusted source for local and national news. Stay informed with accurate and timely reporting by Avinash Sona.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating WhatsApp Button -->
+    <div class="floating-whatsapp">
+        <a href="https://whatsapp.com/channel/0029VaGK3VoAhY2UeTcaHSAn" 
+           target="_blank" 
+           class="whatsapp-float-btn"
+           title="WhatsApp चैनल से जुड़ें">
+            <i class="fab fa-whatsapp"></i>
+            <span class="whatsapp-text">चैनल से जुड़ें</span>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row py-5">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <svg class="logo-svg me-3" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="footerLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="footerShadow">
+                                    <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.2"/>
+                                </filter>
+                            </defs>
+                            <!-- Footer logo background shape -->
+                            <path d="M10 15 Q10 5 20 5 L100 5 Q110 5 110 15 L108 55 Q108 65 100 65 L20 65 Q10 65 10 55 Z" fill="url(#footerLogoGradient)" stroke="#ffffff" stroke-width="1" filter="url(#footerShadow)"/>
+                            <path d="M8 13 Q8 3 18 3 L98 3 Q108 3 108 13 L106 53 Q106 63 98 63 L18 63 Q8 63 8 53 Z" fill="#CC0000" opacity="0.1"/>
+                            
+                            <!-- Text: THE BHILAI REPORT -->
+                            <text x="60" y="25" text-anchor="middle" fill="#CC0000" font-family="Arial Black, sans-serif" font-size="11" font-weight="900">THE BHILAI</text>
+                            <text x="60" y="38" text-anchor="middle" fill="#CC0000" font-family="Arial Black, sans-serif" font-size="11" font-weight="900">REPORT</text>
+                            
+                            <!-- Text: BY AVINASH SONA -->
+                            <text x="60" y="52" text-anchor="middle" fill="#CC0000" font-family="Arial, sans-serif" font-size="8" font-weight="bold">BY AVINASH SONA</text>
+                            
+                            <!-- Decorative elements -->
+                            <circle cx="20" cy="20" r="1.5" fill="#CC0000" opacity="0.6"/>
+                            <circle cx="100" cy="20" r="1.5" fill="#CC0000" opacity="0.6"/>
+                            <circle cx="20" cy="50" r="1.5" fill="#CC0000" opacity="0.6"/>
+                            <circle cx="100" cy="50" r="1.5" fill="#CC0000" opacity="0.6"/>
+                        </svg>
+                        <div>
+                            <h5 class="text-white mb-0">THE BHILAI REPORT</h5>
+                            <small class="text-light">BY AVINASH SONA</small>
+                        </div>
+                    </div>
+                    <p class="text-light">Your trusted source for accurate and timely news reporting.</p>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light text-decoration-none">About Us</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Contact Us</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Advertise With Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="text-white mb-3">Legal</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Terms & Conditions</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Grievance Redressal Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="text-white mb-3">Connect With Us</h6>
+                    <div class="social-links mb-3">
+                        <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p class="text-light small mb-0">Sitemap</p>
+                </div>
+            </div>
+            
+            <hr class="border-light">
+            
+            <div class="row py-3">
+                <div class="col-md-6">
+                    <p class="text-light small mb-0">&copy; 2025 The Bhilai Report. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-light small mb-0">Designed with <i class="fas fa-heart text-danger"></i> for accurate journalism</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOa_wOoQa-c8w-donOqzNTbrJlc7Qr8k4",
+            authDomain: "the-bhilai-report-by-avinash.firebaseapp.com",
+            projectId: "the-bhilai-report-by-avinash",
+            storageBucket: "the-bhilai-report-by-avinash.appspot.com",
+            messagingSenderId: "898840424615",
+            appId: "1:898840424615:web:5ba4c49e8a30f30e292e86",
+            measurementId: "G-86J05AVANQ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Global variables
+        let articles = [];
+        let currentShareUrl = '';
+        let currentShareTitle = '';
+
+        // DOM Elements
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error-message');
+        const newsContainer = document.getElementById('news-container');
+        const noArticlesElement = document.getElementById('no-articles');
+
+        // Advertisement templates
+        const adTemplates = [
+            {
+                title: "स्थानीय व्यापार को बढ़ावा दें",
+                description: "भिलाई के स्थानीय उत्पादों और सेवाओं का समर्थन करें। हमारे साथ विज्ञापन दें।",
+                cta: "संपर्क करें",
+                link: "#contact"
+            },
+            {
+                title: "डिजिटल मार्केटिंग सेवाएं",
+                description: "अपने व्यापार को ऑनलाइन बढ़ाएं। सोशल मीडिया और वेबसाइट मार्केटिंग के लिए संपर्क करें।",
+                cta: "अधिक जानें",
+                link: "#services"
+            },
+            {
+                title: "शिक्षा परामर्श सेवा",
+                description: "करियर गाइडेंस और कॉलेज एडमिशन में सहायता। विशेषज्ञों से मुफ्त सलाह लें।",
+                cta: "मुफ्त परामर्श",
+                link: "#education"
+            },
+            {
+                title: "स्वास्थ्य जांच शिविर",
+                description: "निःशुल्क स्वास्थ्य जांच और डॉक्टरी सलाह। अपने स्वास्थ्य की देखभाल करें।",
+                cta: "अभी बुक करें",
+                link: "#health"
+            }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNews();
+            setupEventListeners();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Mobile menu toggle
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            
+            if (navbarToggler) {
+                navbarToggler.addEventListener('click', function() {
+                    navbarCollapse.classList.toggle('show');
+                });
+            }
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Load news from Firebase
+        async function loadNews() {
+            try {
+                showLoading();
+                
+                // Fetch articles from Firestore
+                const snapshot = await db.collection('articles')
+                    .orderBy('publishedAt', 'desc')
+                    .limit(20)
+                    .get();
+                
+                if (snapshot.empty) {
+                    showNoArticles();
+                    return;
+                }
+                
+                articles = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    articles.push({
+                        id: doc.id,
+                        ...data
+                    });
+                });
+                
+                renderNews();
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error loading news:', error);
+                showError();
+            }
+        }
+
+        // Show loading state
+        function showLoading() {
+            loadingElement.classList.remove('d-none');
+            errorElement.classList.add('d-none');
+            noArticlesElement.classList.add('d-none');
+            newsContainer.innerHTML = '';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            loadingElement.classList.add('d-none');
+        }
+
+        // Show error state
+        function showError() {
+            hideLoading();
+            errorElement.classList.remove('d-none');
+            noArticlesElement.classList.add('d-none');
+            newsContainer.innerHTML = '';
+        }
+
+        // Show no articles state
+        function showNoArticles() {
+            hideLoading();
+            errorElement.classList.add('d-none');
+            noArticlesElement.classList.remove('d-none');
+            newsContainer.innerHTML = '';
+        }
+
+        // Render news articles
+        function renderNews() {
+            newsContainer.innerHTML = '';
+            
+            articles.forEach((article, index) => {
+                // Add article
+                const articleElement = createArticleElement(article);
+                newsContainer.appendChild(articleElement);
+                
+                // Add advertisement after every 3 articles
+                if ((index + 1) % 3 === 0 && index < articles.length - 1) {
+                    const adElement = createAdElement(index);
+                    newsContainer.appendChild(adElement);
+                }
+            });
+        }
+
+        // Create article element
+        function createArticleElement(article) {
+            const articleDiv = document.createElement('div');
+            articleDiv.className = 'news-card';
+            
+            // Format date
+            const publishDate = article.publishedAt ? 
+                formatDate(article.publishedAt.toDate()) : 
+                'No date available';
+            
+            // Use Firebase image URL or placeholder
+            const imageUrl = article.imageUrl || `https://via.placeholder.com/800x250/CC0000/FFFFFF?text=${encodeURIComponent(article.title || 'News Image')}`;
+            
+            articleDiv.innerHTML = `
+                <img src="${imageUrl}" alt="${article.title || 'News Article'}" class="news-image" onerror="this.src='https://via.placeholder.com/800x250/CC0000/FFFFFF?text=News+Image'">
+                <div class="news-content">
+                    <h3 class="news-title">${article.title || 'Untitled Article'}</h3>
+                    <p class="news-excerpt">${article.excerpt || article.content?.substring(0, 200) + '...' || 'No content available.'}</p>
+                    
+                    <div class="news-meta">
+                        <div class="author-info">
+                            <img src="https://firebasestorage.googleapis.com/v0/b/the-bhilai-report-by-avinash.firebasestorage.app/o/quality_restoration_20250527015428730.jpg?alt=media&token=8336a034-60f5-4acc-b845-52d2c4826d86" alt="Avinash Sona" class="author-avatar">
+                            <div class="author-details">
+                                <div class="author-name">By Avinash Sona</div>
+                                <div class="publish-date">Published On: ${publishDate}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="share-buttons">
+                            <button class="share-btn facebook" onclick="shareArticle('facebook', '${escapeQuotes(article.title)}', '${article.id}')">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button class="share-btn whatsapp" onclick="shareArticle('whatsapp', '${escapeQuotes(article.title)}', '${article.id}')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="share-btn twitter" onclick="shareArticle('twitter', '${escapeQuotes(article.title)}', '${article.id}')">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                            <button class="share-btn copy" onclick="shareArticle('copy', '${escapeQuotes(article.title)}', '${article.id}')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return articleDiv;
+        }
+
+        // Create advertisement element
+        function createAdElement(index) {
+            const adDiv = document.createElement('div');
+            adDiv.className = 'ad-block';
+            
+            // Select ad template based on index
+            const adTemplate = adTemplates[index % adTemplates.length];
+            
+            adDiv.innerHTML = `
+                <div class="ad-content">
+                    <h3 class="ad-title">${adTemplate.title}</h3>
+                    <p class="ad-description">${adTemplate.description}</p>
+                    <a href="${adTemplate.link}" class="ad-cta">${adTemplate.cta}</a>
+                </div>
+            `;
+            
+            return adDiv;
+        }
+
+        // Format date for display
+        function formatDate(date) {
+            if (!date) return 'No date available';
+            
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Escape quotes for HTML attributes
+        function escapeQuotes(str) {
+            return str ? str.replace(/'/g, "&#39;").replace(/"/g, "&quot;") : '';
+        }
+
+        // Share article function
+        function shareArticle(platform, title, articleId) {
+            const articleUrl = `${window.location.origin}${window.location.pathname}#article-${articleId}`;
+            const shareText = `${title} - The Bhilai Report by Avinash Sona`;
+            
+            switch (platform) {
+                case 'facebook':
+                    shareOnFacebook(articleUrl, shareText);
+                    break;
+                case 'whatsapp':
+                    shareOnWhatsApp(articleUrl, shareText);
+                    break;
+                case 'twitter':
+                    shareOnTwitter(articleUrl, shareText);
+                    break;
+                case 'copy':
+                    copyLink(articleUrl);
+                    break;
+            }
+        }
+
+        // Facebook share
+        function shareOnFacebook(url, text) {
+            const shareUrl = url || window.location.href;
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+        }
+
+        // WhatsApp share
+        function shareOnWhatsApp(url, text) {
+            const shareUrl = url || window.location.href;
+            const message = `${text}\n\n${shareUrl}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Twitter share
+        function shareOnTwitter(url, text) {
+            const shareUrl = url || window.location.href;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+        }
+
+        // Copy link to clipboard
+        function copyLink(url) {
+            const shareUrl = url || window.location.href;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showCopySuccess();
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    fallbackCopyText(shareUrl);
+                });
+            } else {
+                fallbackCopyText(shareUrl);
+            }
+        }
+
+        // Fallback copy method
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                console.error('Fallback copy failed: ', err);
+                alert('Unable to copy link. Please copy manually: ' + text);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // Show copy success message
+        function showCopySuccess() {
+            // Create temporary toast
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideInRight 0.3s ease;
+            `;
+            toast.innerHTML = '<i class="fas fa-check me-2"></i>Link copied to clipboard!';
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Handle offline/online status
+        window.addEventListener('online', function() {
+            if (articles.length === 0) {
+                loadNews();
+            }
+        });
+
+        window.addEventListener('offline', function() {
+            console.log('App is offline');
+        });
+
+        // Smooth scroll behavior for the page
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>
