@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avinash Sona - Grocery List</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .made-with-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #4e65ff 0%, #6e8ffb 100%);
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(78, 101, 255, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .heart-icon {
+            display: inline-block;
+            margin-left: 6px;
+            color: #ff3c3c;
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: cover;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            background: #f0f0f0;
+            max-width: 100%;
+            image-rendering: auto;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 25px 20px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #333;
+        }
+
+        /* Barcode Scanner Styles */
+        .barcode-section {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+            border: 2px solid #28a745;
+        }
+
+        .scanner-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .scanner-video {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            border-radius: 10px;
+            background: #000;
+            margin: 0 auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .scanner-overlay {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .scan-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 100px;
+            border: 3px solid #ff0000;
+            border-radius: 10px;
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff0000, transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { transform: translateY(-50px); opacity: 0; }
+            50% { transform: translateY(0); opacity: 1; }
+        }
+
+        .scanner-status {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .scanner-status.scanning {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .scanner-status.success {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .scanner-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .barcode-result {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 20px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .item.selected {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+
+        .item-price {
+            color: #28a745;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 15px;
+        }
+
+        .quantity-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .quantity {
+            min-width: 35px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .edit-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 11px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .selected-items {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .selected-item-info {
+            flex: 1;
+        }
+
+        .selected-item-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .selected-item-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .selected-item-total {
+            font-weight: 700;
+            color: #28a745;
+            font-size: 1.1rem;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+
+        .total-label {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .item {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .quantity-controls {
+                align-self: center;
+                margin-right: 0;
+            }
+
+            .edit-controls {
+                justify-content: center;
+            }
+
+            .profile-photo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .scanner-controls {
+                justify-content: center;
+            }
+        }
+
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: #f8f9fa;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .suggestion-price {
+            color: #28a745;
+            font-size: 0.9em;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div class="made-with-badge">
+            Made With Avinash_Sona <span class="heart-icon">❤️</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <img src="https://firebasestorage.googleapis.com/v0/b/the-bhilai-report-by-avinash.firebasestorage.app/o/quality_restoration_20250527015428730.jpg?alt=media&token=8336a034-60f5-4acc-b845-52d2c4826d86" alt="Avinash Sona" class="profile-photo" onload="this.style.opacity='1'" onerror="this.style.display='none'" style="opacity: 0; transition: opacity 0.3s ease;">
+            <h1>Avinash Sona</h1>
+        </div>
+
+        <div class="main-content">
+            <!-- Statistics -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalItemsCount">0</div>
+                    <div class="stat-label">Total Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="selectedItemsCount">0</div>
+                    <div class="stat-label">Selected</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">₹<span id="totalAmountDisplay">0</span></div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+            </div>
+
+            <!-- Barcode Scanner Section -->
+            <div class="section barcode-section">
+                <h3>📱 Barcode Scanner</h3>
+                <div class="scanner-controls">
+                    <button class="btn btn-primary" onclick="startBarcodeScanner()">📷 Start Scanning</button>
+                    <button class="btn btn-danger" onclick="stopBarcodeScanner()">⏹️ Stop Scanning</button>
+                    <button class="btn btn-warning" onclick="clearBarcodeResult()">🗑️ Clear Result</button>
+                </div>
+                
+                <div id="barcodeContainer" style="text-align: center; display: none;">
+                    <div class="scanner-overlay">
+                        <video id="barcodeVideo" class="scanner-video" autoplay muted playsinline></video>
+                        <div class="scan-box">
+                            <div class="scan-line"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="barcodeStatus" class="scanner-status" style="display: none;">
+                    📱 Camera ready - Point barcode at the red box
+                </div>
+
+                <div id="barcodeResultDiv" style="display: none;">
+                    <div class="barcode-result">
+                        <strong>Scanned Barcode:</strong> <span id="barcodeResultText"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Item Section -->
+            <div class="section">
+                <h3>➕ Add New Item</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Item Name:</label>
+                        <div style="position: relative;">
+                            <input type="text" id="newItemName" placeholder="Type item name..." oninput="showSuggestions()" onfocus="showSuggestions()" onblur="hideSuggestions()">
+                            <div id="suggestions" class="suggestions-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Price:</label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #28a745; font-weight: bold; font-size: 16px;">₹</span>
+                            <input type="number" id="newItemPrice" placeholder="Enter price" min="0" step="0.01" style="padding-left: 35px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Barcode (Optional):</label>
+                        <input type="text" id="newItemBarcode" placeholder="Scan or enter barcode">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="display: flex; align-items: end;">
+                        <button class="btn btn-primary" onclick="addNewItem()" style="width: 100%;">Add Item</button>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: end;">
+                        <button class="btn btn-warning" onclick="scanBarcodeForNewItem()" style="width: 100%;">📱 Scan Barcode</button>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: end;">
+                        <button class="btn btn-danger" onclick="clearNewItemForm()" style="width: 100%;">🗑️ Clear Form</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weight Calculator Section -->
+            <div class="section">
+                <h3>⚖️ Weight Calculator</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rate per Kg (₹):</label>
+                        <input type="number" id="ratePerKg" placeholder="e.g. 150">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (in Grams):</label>
+                        <input type="number" id="weightInGrams" placeholder="e.g. 513">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: end;">
+                        <button class="btn btn-primary" onclick="calculateWeightPrice()">Calculate</button>
+                    </div>
+                </div>
+                <div class="total-section" style="margin-top: 10px;">
+                    <div class="total-label">Total Price:</div>
+                    <div class="total-amount" id="weightTotal">₹0.00</div>
+                </div>
+            </div>
+
+            <!-- Amount to Weight Calculator -->
+            <div class="section">
+                <h3>💰 ₹ से Weight Calculator</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rate per Kg (₹):</label>
+                        <input type="number" id="rate" placeholder="e.g. 360">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount You Want to Spend (₹):</label>
+                        <input type="number" id="amount" placeholder="e.g. 50">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: end;">
+                        <button class="btn btn-primary" onclick="calculateWeight()">Calculate</button>
+                    </div>
+                </div>
+                <div class="total-section" style="margin-top: 10px;">
+                    <div class="total-label">Approx Weight:</div>
+                    <div class="total-amount" id="result">0 grams</div>
+                </div>
+            </div>
+
+            <!-- Search Items -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search items..." oninput="filterItems()">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <!-- All Items List -->
+            <div class="section">
+                <h3>🛒 All Items (<span id="totalItems">0</span>)</h3>
+                <div id="itemsList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <p>No items available. Add some items to get started!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selected Items -->
+            <div class="section">
+                <h3>📝 Selected Items (<span id="selectedCount">0</span>)</h3>
+                <div id="selectedList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No items selected yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Section -->
+            <div class="total-section">
+                <div class="total-label">Total Amount:</div>
+                <div class="total-amount">₹<span id="totalAmount">0</span></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="buttons">
+                <button class="btn btn-success" onclick="generatePDF()">📄 Download PDF</button>
+                <button class="btn btn-whatsapp" onclick="shareOnWhatsApp()">📱 Share WhatsApp</button>
+                <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+                <button class="btn btn-primary" onclick="exportData()">💾 Export Data</button>
+                <button class="btn btn-warning" onclick="importData()">📂 Import Data</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(event)">
+
+    <script>
+        // Enhanced grocery items list with barcodes
+        let allItems = [
+            { name: "Sugar", price: 48, barcode: "1234567890123" },
+            { name: "Tea Leaf", price: 410, barcode: "2345678901234" },
+            { name: "Wheat Flour (आटा)", price: 40, barcode: "3456789012345" },
+            { name: "Refined Oil", price: 140, barcode: "4567890123456" },
+            { name: "Mustard Oil", price: 160, barcode: "5678901234567" },
+            { name: "Bath Soap", price: 120, barcode: "6789012345678" },
+            { name: "Surf Excel", price: 125, barcode: "7890123456789" },
+            { name: "Poha", price: 52, barcode: "8901234567890" },
+            { name: "Suji", price: 54, barcode: "9012345678901" },
+            { name: "Soya Chunks", price: 129, barcode: "0123456789012" },
+            { name: "Coconut Hair Oil", price: 371, barcode: "1122334455667" },
+            { name: "Toor Dal", price: 160, barcode: "2233445566778" },
+            { name: "Moong Dal", price: 120, barcode: "3344556677889" },
+            { name: "Masoor Dal", price: 120, barcode: "4455667788990" },
+            { name: "White Urad Dal", price: 120, barcode: "5566778899001" },
+            { name: "White Peas", price: 140, barcode: "6677889900112" },
+            { name: "Desi Chana", price: 100, barcode: "7788990011223" },
+            { name: "Green Moong", price: 120, barcode: "8899001122334" },
+            { name: "Shampoo", price: 80, barcode: "9900112233445" },
+            { name: "Tomato Sauce", price: 80, barcode: "0011223344556" },
+            { name: "Mixed Fruit Jam", price: 180, barcode: "1111222233334" },
+            { name: "Chilli Powder", price: 320, barcode: "2222333344445" },
+            { name: "Turmeric Powder", price: 300, barcode: "3333444455556" },
+            { name: "Coriander Powder", price: 210, barcode: "4444555566667" },
+            { name: "Agarbatti", price: 25, barcode: "5555666677778" },
+            { name: "Dhup", price: 30, barcode: "6666777788889" },
+            { name: "Cotton", price: 40, barcode: "7777888899990" },
+            { name: "Face Cream", price: 85, barcode: "8888999900001" },
+            { name: "Boroplus", price: 65, barcode: "9999000011112" },
+            { name: "Razor Blade", price: 25, barcode: "0000111122223" },
+            { name: "Face Powder", price: 120, barcode: "1010101010101" },
+            { name: "Camphor", price: 50, barcode: "2020202020202" },
+            { name: "Cumin Seeds", price: 320, barcode: "3030303030303" },
+            { name: "Mustard Seeds", price: 180, barcode: "4040404040404" },
+            { name: "Raw Peanuts", price: 120, barcode: "5050505050505" },
+            { name: "Perfume", price: 250, barcode: "6060606060606" },
+            { name: "Hand Wash", price: 110, barcode: "7070707070707" },
+            { name: "Antiseptic Liquid", price: 150, barcode: "8080808080808" },
+            { name: "Black Pepper", price: 500, barcode: "9090909090909" },
+            { name: "Cardamom", price: 800, barcode: "1212121212121" },
+            { name: "Cloves", price: 600, barcode: "1313131313131" },
+            { name: "Sabudana", price: 80, barcode: "1414141414141" },
+            { name: "Daliya", price: 60, barcode: "1515151515151" },
+            { name: "Pasta", price: 120, barcode: "1616161616161" },
+            { name: "Noodles", price: 100, barcode: "1717171717171" },
+            { name: "Papad", price: 80, barcode: "1818181818181" },
+            { name: "Vermicelli", price: 90, barcode: "1919191919191" },
+            { name: "Besan", price: 100, barcode: "2121212121212" },
+            { name: "Maida", price: 100, barcode: "2222222222222" },
+            { name: "Rice (चावल)", price: 80, barcode: "2323232323232" },
+            { name: "Salt (नमक)", price: 25, barcode: "2424242424242" },
+            { name: "Onion (प्याज)", price: 40, barcode: "2525252525252" },
+            { name: "Potato (आलू)", price: 30, barcode: "2626262626262" },
+            { name: "Tomato (टमाटर)", price: 60, barcode: "2727272727272" },
+            { name: "Milk (दूध)", price: 55, barcode: "2828282828282" },
+            { name: "Bread (ब्रेड)", price: 25, barcode: "2929292929292" },
+            { name: "Biscuits", price: 50, barcode: "3131313131313" },
+            { name: "Toothpaste", price: 60, barcode: "3232323232323" }
+        ];
+
+        let selectedItems = {};
+        let filteredItems = [...allItems];
+
+        // Barcode Scanner Variables
+        let barcodeScanner = null;
+        let scannerActive = false;
+
+        // Barcode Scanner Functions
+        function startBarcodeScanner() {
+            const video = document.getElementById('barcodeVideo');
+            const container = document.getElementById('barcodeContainer');
+            const status = document.getElementById('barcodeStatus');
+
+            container.style.display = 'block';
+            status.style.display = 'block';
+            status.className = 'scanner-status scanning';
+            status.textContent = '📱 Starting camera...';
+
+            // Check if browser supports getUserMedia
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                status.className = 'scanner-status error';
+                status.textContent = '❌ Camera not supported in this browser';
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: { ideal: 'environment' },
+                    width: { ideal: 640, min: 320, max: 1920 },
+                    height: { ideal: 480, min: 240, max: 1080 }
+                } 
+            })
+            .then(function(stream) {
+                video.srcObject = stream;
+                scannerActive = true;
+                
+                video.onloadedmetadata = function() {
+                    video.play().then(() => {
+                        initQuaggaScanner();
+                    }).catch(err => {
+                        console.error('Video play error:', err);
+                        status.className = 'scanner-status error';
+                        status.textContent = '❌ Video playback failed';
+                    });
+                };
+            })
+            .catch(function(err) {
+                console.error('Camera access error:', err);
+                status.className = 'scanner-status error';
+                
+                if (err.name === 'NotAllowedError') {
+                    status.textContent = '❌ Camera access denied. Please allow camera permission.';
+                } else if (err.name === 'NotFoundError') {
+                    status.textContent = '❌ No camera found on this device.';
+                } else if (err.name === 'NotSupportedError') {
+                    status.textContent = '❌ Camera not supported in this browser.';
+                } else {
+                    status.textContent = '❌ Camera error: ' + err.message;
+                }
+            });
+        }
+
+        function initQuaggaScanner() {
+            if (typeof Quagga === 'undefined') {
+                document.getElementById('barcodeStatus').textContent = '❌ Barcode scanner library not loaded';
+                return;
+            }
+
+            if (barcodeScanner) {
+                try {
+                    Quagga.stop();
+                    Quagga.offDetected();
+                } catch (e) {
+                    console.log('Previous scanner cleanup error:', e);
+                }
+            }
+
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.getElementById('barcodeVideo'),
+                    constraints: {
+                        width: { min: 640, ideal: 1280, max: 1920 },
+                        height: { min: 480, ideal: 720, max: 1080 },
+                        facingMode: "environment"
+                    },
+                    area: { // defines rectangle of the detection/localization area
+                        top: "0%",    // top offset
+                        right: "0%",  // right offset
+                        left: "0%",   // left offset
+                        bottom: "0%"  // bottom offset
+                    }
+                },
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_39_vin_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader"
+                    ],
+                    debug: {
+                        drawBoundingBox: false,
+                        showFrequency: false,
+                        drawScanline: false,
+                        showPattern: false
+                    },
+                    multiple: false
+                },
+                locate: true,
+                locator: {
+                    halfSample: false,
+                    patchSize: "large", // x-small, small, medium, large, x-large
+                    debug: {
+                        showCanvas: false,
+                        showPatches: false,
+                        showFoundPatches: false,
+                        showSkeleton: false,
+                        showLabels: false,
+                        showPatchLabels: false,
+                        showRemainingPatchLabels: false,
+                        boxFromPatches: {
+                            showTransformed: false,
+                            showTransformedBox: false,
+                            showBB: false
+                        }
+                    }
+                },
+                numOfWorkers: 2,
+                frequency: 10
+            }, function(err) {
+                if (err) {
+                    console.error('Quagga initialization error:', err);
+                    document.getElementById('barcodeStatus').textContent = '❌ Scanner initialization failed';
+                    return;
+                }
+                
+                Quagga.start();
+                barcodeScanner = Quagga;
+                document.getElementById('barcodeStatus').textContent = '📱 Camera ready - Point barcode at the red box';
+                
+                // Enhanced detection with debouncing
+                let lastDetectedCode = '';
+                let lastDetectionTime = 0;
+                
+                Quagga.onDetected(function(data) {
+                    if (data && data.codeResult && data.codeResult.code) {
+                        const code = data.codeResult.code;
+                        const currentTime = Date.now();
+                        
+                        // Debounce: prevent same code detection within 2 seconds
+                        if (code !== lastDetectedCode || (currentTime - lastDetectionTime) > 2000) {
+                            lastDetectedCode = code;
+                            lastDetectionTime = currentTime;
+                            handleBarcodeResult(code);
+                        }
+                    }
+                });
+            });
+        }
+
+        function handleBarcodeResult(barcode) {
+            document.getElementById('barcodeResultText').textContent = barcode;
+            document.getElementById('barcodeResultDiv').style.display = 'block';
+            
+            if (scanningForNewItem) {
+                // For new item - just fill the barcode field
+                document.getElementById('newItemBarcode').value = barcode;
+                document.getElementById('newItemName').focus();
+                
+                document.getElementById('barcodeStatus').className = 'scanner-status success';
+                document.getElementById('barcodeStatus').textContent = `✅ Barcode scanned: ${barcode}`;
+                
+                showNotification('Barcode scanned! Now enter product name and price.', 'success');
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+                
+                scanningForNewItem = false;
+                stopBarcodeScanner();
+                return;
+            }
+            
+            // Find exact barcode match in allItems
+            const foundItem = allItems.find(item => item.barcode === barcode);
+            
+            if (foundItem) {
+                // Add to cart
+                toggleItem(foundItem.name, foundItem.price);
+                showNotification(`${foundItem.name} added to cart! Price: ₹${foundItem.price}`, 'success');
+                
+                // Visual feedback
+                document.getElementById('barcodeStatus').className = 'scanner-status success';
+                document.getElementById('barcodeStatus').textContent = `✅ Found: ${foundItem.name} - ₹${foundItem.price}`;
+                
+                // Play scan sound
+                playSuccessSound();
+                
+                // Strong vibration if supported
+                if (navigator.vibrate) {
+                    navigator.vibrate([300, 100, 300, 100, 300]);
+                }
+                
+                // Auto-stop scanner after successful scan
+                setTimeout(() => {
+                    stopBarcodeScanner();
+                }, 3000);
+            } else {
+                // Product not found - auto-fill new item form
+                document.getElementById('newItemName').value = `Product-${barcode}`;
+                document.getElementById('newItemBarcode').value = barcode;
+                document.getElementById('newItemPrice').focus();
+                
+                showNotification('Product not found! Please add product details below.', 'error');
+                
+                document.getElementById('barcodeStatus').className = 'scanner-status error';
+                document.getElementById('barcodeStatus').textContent = `❌ Product not found for barcode: ${barcode}`;
+                
+                // Continue scanning for other products
+            }
+        }
+
+        function stopBarcodeScanner() {
+            const video = document.getElementById('barcodeVideo');
+            const container = document.getElementById('barcodeContainer');
+            const status = document.getElementById('barcodeStatus');
+
+            if (scannerActive) {
+                if (video.srcObject) {
+                    const tracks = video.srcObject.getTracks();
+                    tracks.forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+
+                if (barcodeScanner && typeof Quagga !== 'undefined') {
+                    try {
+                        Quagga.stop();
+                        Quagga.offDetected();
+                    } catch (e) {
+                        console.log('Scanner stop error:', e);
+                    }
+                    barcodeScanner = null;
+                }
+
+                scannerActive = false;
+            }
+
+            container.style.display = 'none';
+            status.style.display = 'none';
+        }
+
+        function clearBarcodeResult() {
+            document.getElementById('barcodeResultDiv').style.display = 'none';
+            document.getElementById('barcodeResultText').textContent = '';
+        }
+
+        // Sound Functions
+        function playSuccessSound() {
+            try {
+                // Create audio context for beep sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create oscillator for beep
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Set frequency and volume
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // High pitch beep
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                
+                // Play for 200ms
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.2);
+                
+                // Second beep after short pause
+                setTimeout(() => {
+                    const oscillator2 = audioContext.createOscillator();
+                    const gainNode2 = audioContext.createGain();
+                    
+                    oscillator2.connect(gainNode2);
+                    gainNode2.connect(audioContext.destination);
+                    
+                    oscillator2.frequency.setValueAtTime(1000, audioContext.currentTime);
+                    gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    
+                    oscillator2.start();
+                    oscillator2.stop(audioContext.currentTime + 0.15);
+                }, 100);
+                
+            } catch (error) {
+                console.log('Audio not supported:', error);
+                // Fallback: try to play system sound
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+HouGccFDGP1vLNeSUFJHfI8N+ORQkUXrPo66hYFQlEnt/nuGkcFjOO1/LNeSwGJnfJ8N+SQwkSXbLl66xfGQc+m+LyvmUdGDGO2PLNeSgEInbH79yOSgsKVKLS7aqMaRkGPKfl66pXGQU6k9ntvWcdGSaO1/LPeSgGJ3jF8N6RSgsMXKre66dXGQc2jdXr6G8fHTCJ1PLUfigFJHfF8N6UUAwTVq7e6qZUGwc7ktvpwGMeHCaQ1/LNeCcEKnjC7t6RTQoLXa3i7KdNGQQ4kdTr8XYhGh2L0vHUgioFJXfE7N2XVAoLXa3f66RPGAc5k9XuzmwjGSJ/1PLPdzoCJHfC79OQTAsMXqzd66VYGgg6k9PrwnEcHCiQ1vLKeCMLKnbB7tSQUAoNYK3e66dVHQU5k9LowmocGDOL1fDUeCUEKnbB7tiTTAoMYK7e7KdOGQc3lNLqxHAaGS+N1PDNeSgFIHbE79WPTAsNXa3c7KVWGQU9k9Dp0m4jGSJ9z/LOdT0CJXfC79KPTAoPYavc66VQGAfYgU3g4mAq');
+                    audio.volume = 0.5;
+                    audio.play();
+                } catch (e) {
+                    console.log('No audio support available');
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            renderItems();
+            updateSelectedList();
+            updateTotal();
+            updateStats();
+        });
+
+        // Load data from localStorage
+        function loadData() {
+            const savedItems = localStorage.getItem('avinashSonaItems');
+            const savedSelected = localStorage.getItem('avinashSonaSelected');
+            
+            if (savedItems) {
+                try {
+                    allItems = JSON.parse(savedItems);
+                } catch (e) {
+                    console.error('Error loading items:', e);
+                }
+            }
+            if (savedSelected) {
+                try {
+                    selectedItems = JSON.parse(savedSelected);
+                } catch (e) {
+                    console.error('Error loading selected items:', e);
+                }
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('avinashSonaItems', JSON.stringify(allItems));
+                localStorage.setItem('avinashSonaSelected', JSON.stringify(selectedItems));
+            } catch (e) {
+                console.error('Error saving data:', e);
+                alert('Error saving data. Storage might be full.');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalItemsCount').textContent = allItems.length;
+            document.getElementById('selectedItemsCount').textContent = Object.keys(selectedItems).length;
+            
+            const total = Object.values(selectedItems).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('totalAmountDisplay').textContent = total;
+        }
+
+        // Barcode scanner for new item
+        let scanningForNewItem = false;
+
+        function scanBarcodeForNewItem() {
+            scanningForNewItem = true;
+            startBarcodeScanner();
+        }
+
+        function clearNewItemForm() {
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemPrice').value = '';
+            document.getElementById('newItemBarcode').value = '';
+        }
+
+        // Add new item
+        function addNewItem() {
+            const name = document.getElementById('newItemName').value.trim();
+            const price = parseFloat(document.getElementById('newItemPrice').value);
+            const barcode = document.getElementById('newItemBarcode').value.trim();
+
+            if (!name || !price || price <= 0) {
+                alert('कृपया valid item name और price enter करें!');
+                return;
+            }
+
+            // Check if item already exists
+            const existingItem = allItems.find(item => item.name.toLowerCase() === name.toLowerCase());
+            if (existingItem) {
+                alert('यह item पहले से exist करता है!');
+                return;
+            }
+
+            // Check if barcode already exists
+            if (barcode && allItems.find(item => item.barcode === barcode)) {
+                alert('यह barcode पहले से exist करता है!');
+                return;
+            }
+
+            const newItem = { name, price };
+            if (barcode) {
+                newItem.barcode = barcode;
+            }
+
+            allItems.push(newItem);
+            saveData();
+            renderItems();
+            updateStats();
+            
+            // Clear form
+            clearNewItemForm();
+            
+            // Show success message
+            showNotification('Item successfully added with barcode!', 'success');
+        }
+
+        // Render all items
+        function renderItems() {
+            const itemsList = document.getElementById('itemsList');
+            const totalItems = document.getElementById('totalItems');
+            
+            totalItems.textContent = allItems.length;
+            
+            if (allItems.length === 0) {
+                itemsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <p>No items available. Add some items to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            filteredItems = allItems.filter(item => 
+                item.name.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredItems.length === 0) {
+                itemsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <p>No items match your search criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            itemsList.innerHTML = filteredItems.map((item, index) => `
+                <div class="item ${selectedItems[item.name] ? 'selected' : ''}" onclick="toggleItem('${item.name}', ${item.price})">
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">₹${item.price}</div>
+                        ${item.barcode ? `<div style="font-size: 11px; color: #666; font-family: monospace; margin-top: 2px;">📱 ${item.barcode}</div>` : ''}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        ${selectedItems[item.name] ? `
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="event.stopPropagation(); updateQuantity('${item.name}', -1)">-</button>
+                                <span class="quantity">${selectedItems[item.name].quantity}</span>
+                                <button class="quantity-btn" onclick="event.stopPropagation(); updateQuantity('${item.name}', 1)">+</button>
+                            </div>
+                        ` : ''}
+                        <div class="edit-controls">
+                            <button class="btn-small btn-edit" onclick="event.stopPropagation(); editItem(${allItems.indexOf(item)})">Edit</button>
+                            <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteItem(${allItems.indexOf(item)})">Del</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter items based on search
+        function filterItems() {
+            renderItems();
+        }
+
+        // Toggle item selection
+        function toggleItem(name, price) {
+            if (selectedItems[name]) {
+                updateQuantity(name, 1);
+            } else {
+                selectedItems[name] = { price: price, quantity: 1 };
+                saveData();
+                renderItems();
+                updateSelectedList();
+                updateTotal();
+                updateStats();
+            }
+        }
+
+        // Update quantity
+        function updateQuantity(name, change) {
+            if (selectedItems[name]) {
+                selectedItems[name].quantity += change;
+                if (selectedItems[name].quantity <= 0) {
+                    delete selectedItems[name];
+                }
+                saveData();
+                renderItems();
+                updateSelectedList();
+                updateTotal();
+                updateStats();
+            }
+        }
+
+        // Update selected items list
+        function updateSelectedList() {
+            const selectedList = document.getElementById('selectedList');
+            const selectedCount = document.getElementById('selectedCount');
+            const items = Object.entries(selectedItems);
+            
+            selectedCount.textContent = items.length;
+            
+            if (items.length === 0) {
+                selectedList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No items selected yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            selectedList.innerHTML = items.map(([name, data]) => `
+                <div class="selected-item">
+                    <div class="selected-item-info">
+                        <div class="selected-item-name">${name}</div>
+                        <div class="selected-item-details">₹${data.price} × ${data.quantity}</div>
+                    </div>
+                    <div class="selected-item-total">₹${(data.price * data.quantity).toFixed(2)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Update total
+        function updateTotal() {
+            const total = Object.values(selectedItems).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('totalAmount').textContent = total.toFixed(2);
+        }
+
+        // Edit item
+        function editItem(index) {
+            const item = allItems[index];
+            const newName = prompt('Edit item name:', item.name);
+            const newPrice = prompt('Edit price:', item.price);
+
+            if (newName && newPrice && parseFloat(newPrice) > 0) {
+                // Update in selectedItems if it exists there
+                if (selectedItems[item.name]) {
+                    const selectedData = selectedItems[item.name];
+                    delete selectedItems[item.name];
+                    selectedItems[newName] = selectedData;
+                }
+
+                // Update the item
+                allItems[index] = {
+                    name: newName,
+                    price: parseFloat(newPrice)
+                };
+
+                saveData();
+                renderItems();
+                updateSelectedList();
+                updateTotal();
+                updateStats();
+                showNotification('Item updated successfully!', 'success');
+            }
+        }
+
+        // Delete item
+        function deleteItem(index) {
+            const item = allItems[index];
+            if (confirm(`क्या आप "${item.name}" को delete करना चाहते हैं?`)) {
+                // Remove from selected items if it exists
+                delete selectedItems[item.name];
+                
+                // Remove from all items
+                allItems.splice(index, 1);
+                
+                saveData();
+                renderItems();
+                updateSelectedList();
+                updateTotal();
+                updateStats();
+                showNotification('Item deleted successfully!', 'success');
+            }
+        }
+
+        // Enhanced PDF generation with better mobile support
+        function generatePDF() {
+            const items = Object.entries(selectedItems);
+            
+            if (items.length === 0) {
+                alert('कृपया पहले कुछ items select करें!');
+                return;
+            }
+
+            // Check if jsPDF is loaded
+            if (typeof window.jsPDF === 'undefined' && typeof window.jspdf === 'undefined') {
+                generateTextPDF();
+                return;
+            }
+
+            try {
+                // Try multiple ways to access jsPDF
+                let jsPDF;
+                if (window.jsPDF) {
+                    jsPDF = window.jsPDF;
+                } else if (window.jspdf && window.jspdf.jsPDF) {
+                    jsPDF = window.jspdf.jsPDF;
+                } else {
+                    throw new Error('jsPDF not found');
+                }
+
+                const doc = new jsPDF();
+
+                // Set font
+                doc.setFont("helvetica");
+
+                // Header - Only "Avinash Sona" as requested
+                doc.setFontSize(20);
+                doc.setTextColor(102, 126, 234);
+                doc.text('Avinash Sona', 105, 30, { align: 'center' });
+
+                // Date
+                doc.setFontSize(12);
+                doc.setTextColor(100, 100, 100);
+                const currentDate = new Date().toLocaleDateString('en-IN');
+                doc.text(`Date: ${currentDate}`, 20, 50);
+
+                // Table headers
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("helvetica", "bold");
+                doc.text("Item Name", 20, 70);
+                doc.text("Price", 120, 70);
+                doc.text("Qty", 150, 70);
+                doc.text("Total", 170, 70);
+
+                // Draw header line
+                doc.line(20, 75, 190, 75);
+
+                // Items
+                let yPosition = 90;
+                let grandTotal = 0;
+
+                doc.setFont("helvetica", "normal");
+                items.forEach(([name, data]) => {
+                    const itemTotal = data.price * data.quantity;
+                    grandTotal += itemTotal;
+
+                    if (yPosition > 250) {
+                        doc.addPage();
+                        yPosition = 30;
+                    }
+
+                    doc.setFontSize(10);
+                    doc.text(name.length > 25 ? name.substring(0, 25) + '...' : name, 20, yPosition);
+                    doc.text(`Rs.${data.price}`, 120, yPosition);
+                    doc.text(`${data.quantity}`, 150, yPosition);
+                    doc.text(`Rs.${itemTotal}`, 170, yPosition);
+
+                    yPosition += 15;
+                });
+
+                // Total line
+                doc.line(20, yPosition, 190, yPosition);
+                yPosition += 15;
+
+                // Grand total
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(40, 167, 69);
+                doc.text(`Grand Total: Rs.${grandTotal}`, 120, yPosition);
+
+                // Enhanced save for mobile compatibility
+                try {
+                    const fileName = `Avinash_Sona_Grocery_${new Date().toISOString().split('T')[0]}.pdf`;
+                    
+                    // Create blob for mobile compatibility
+                    const pdfBlob = doc.output('blob');
+                    const url = URL.createObjectURL(pdfBlob);
+                    
+                    // For mobile/APK - try to open in external browser (Chrome)
+                    const userAgent = navigator.userAgent;
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+                    const isAPK = userAgent.includes('wv') || userAgent.includes('Version/4.0');
+                    
+                    if (isMobile || isAPK) {
+                        // Method 1: Open in new window - this should trigger Chrome
+                        const popup = window.open(url, '_blank', 'noopener,noreferrer');
+                        if (popup) {
+                            showNotification('PDF Chrome browser में खुल रहा है!', 'success');
+                        } else {
+                            // Fallback: Direct download
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            showNotification('PDF download हो गया!', 'success');
+                        }
+                    } else {
+                        // Desktop: Standard save
+                        doc.save(fileName);
+                        showNotification('PDF downloaded successfully!', 'success');
+                    }
+                    
+                    // Clean up URL
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    
+                } catch (saveError) {
+                    // Fallback: create blob and download manually
+                    const pdfBlob = doc.output('blob');
+                    const url = URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Avinash_Sona_Grocery_${new Date().toISOString().split('T')[0]}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showNotification('PDF downloaded successfully!', 'success');
+                }
+
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                generateTextPDF();
+            }
+        }
+
+        // Fallback text-based PDF for mobile
+        function generateTextPDF() {
+            const items = Object.entries(selectedItems);
+            let content = "AVINASH SONA\n";
+            content += "=".repeat(50) + "\n";
+            content += `Date: ${new Date().toLocaleDateString('en-IN')}\n\n`;
+            
+            content += "GROCERY LIST\n";
+            content += "-".repeat(50) + "\n";
+            
+            let grandTotal = 0;
+            items.forEach(([name, data]) => {
+                const itemTotal = data.price * data.quantity;
+                grandTotal += itemTotal;
+                content += `${name}\n`;
+                content += `  Rs.${data.price} x ${data.quantity} = Rs.${itemTotal}\n\n`;
+            });
+            
+            content += "-".repeat(50) + "\n";
+            content += `GRAND TOTAL: Rs.${grandTotal}\n`;
+            content += "=".repeat(50);
+
+            // Create and download text file
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Avinash_Sona_Grocery_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('List downloaded as text file!', 'success');
+        }
+
+        // Share on WhatsApp
+        function shareOnWhatsApp() {
+            const items = Object.entries(selectedItems);
+            
+            if (items.length === 0) {
+                alert('कृपया पहले कुछ items select करें!');
+                return;
+            }
+
+            let message = "🏠 *Avinash Sona - Grocery List*\n";
+            message += `📅 Date: ${new Date().toLocaleDateString('en-IN')}\n\n`;
+            
+            let grandTotal = 0;
+            items.forEach(([name, data]) => {
+                const itemTotal = data.price * data.quantity;
+                grandTotal += itemTotal;
+                message += `• ${name} - Rs.${data.price} x ${data.quantity} = Rs.${itemTotal}\n`;
+            });
+            
+            message += `\n💰 *Total: Rs.${grandTotal}*`;
+            message += "\n\n_Made with ❤️ by Avinash_Sona_";
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Clear all selected items
+        function clearAll() {
+            if (confirm('क्या आप सभी selected items को clear करना चाहते हैं?')) {
+                selectedItems = {};
+                saveData();
+                renderItems();
+                updateSelectedList();
+                updateTotal();
+                updateStats();
+                showNotification('All items cleared!', 'success');
+            }
+        }
+
+        // Export data
+        function exportData() {
+            const data = { allItems, selectedItems, exportDate: new Date().toISOString() };
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `avinash_sona_data_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showNotification('Data exported successfully!', 'success');
+        }
+
+        // Import data
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        // Handle import
+        function handleImport(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.allItems && Array.isArray(data.allItems)) {
+                            allItems = data.allItems;
+                            selectedItems = data.selectedItems || {};
+                            saveData();
+                            renderItems();
+                            updateSelectedList();
+                            updateTotal();
+                            updateStats();
+                            showNotification('Data imported successfully!', 'success');
+                        } else {
+                            alert('Invalid file format!');
+                        }
+                    } catch (error) {
+                        alert('Error reading file!');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Enhanced suggestions
+        const commonSuggestions = [
+            { name: "Rice (चावल)", price: 80 },
+            { name: "Wheat Flour (आटा)", price: 40 },
+            { name: "Sugar (चीनी)", price: 48 },
+            { name: "Tea (चाय)", price: 200 },
+            { name: "Oil (तेल)", price: 140 },
+            { name: "Salt (नमक)", price: 25 },
+            { name: "Dal (दाल)", price: 120 },
+            { name: "Onion (प्याज)", price: 40 },
+            { name: "Potato (आलू)", price: 30 },
+            { name: "Tomato (टमाटर)", price: 60 }
+        ];
+
+        // Show suggestions
+        function showSuggestions() {
+            const input = document.getElementById('newItemName');
+            const suggestionsDiv = document.getElementById('suggestions');
+            const query = input.value.toLowerCase().trim();
+
+            if (query.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            // Combine existing items and common suggestions
+            const allSuggestions = [...allItems, ...commonSuggestions];
+            const filtered = allSuggestions.filter(item => 
+                item.name.toLowerCase().includes(query) && 
+                !allItems.some(existing => existing.name.toLowerCase() === item.name.toLowerCase())
+            ).slice(0, 8);
+
+            if (filtered.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            suggestionsDiv.innerHTML = filtered.map(item => `
+                <div class="suggestion-item" onclick="selectSuggestion('${item.name}', ${item.price})">
+                    <div class="suggestion-name">${item.name}</div>
+                    <div class="suggestion-price">₹${item.price}</div>
+                </div>
+            `).join('');
+
+            suggestionsDiv.style.display = 'block';
+        }
+
+        // Hide suggestions
+        function hideSuggestions() {
+            setTimeout(() => {
+                document.getElementById('suggestions').style.display = 'none';
+            }, 200);
+        }
+
+        // Select suggestion
+        function selectSuggestion(name, price) {
+            document.getElementById('newItemName').value = name;
+            document.getElementById('newItemPrice').value = price;
+            document.getElementById('suggestions').style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            `;
+
+            // Set color based on type
+            switch(type) {
+                case 'success':
+                    notification.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                    break;
+                case 'error':
+                    notification.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+                    break;
+                default:
+                    notification.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            }
+
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Animate out and remove
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                exportData();
+            }
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                generatePDF();
+            }
+        });
+
+        // Add Enter key support for form
+        document.getElementById('newItemName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('newItemPrice').focus();
+            }
+        });
+
+        document.getElementById('newItemPrice').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addNewItem();
+            }
+        });
+    
+        // 🧮 Calculate weight-based price
+        function calculateWeightPrice() {
+            const rate = parseFloat(document.getElementById("ratePerKg").value);
+            const grams = parseFloat(document.getElementById("weightInGrams").value);
+
+            if (isNaN(rate) || isNaN(grams)) {
+                document.getElementById("weightTotal").textContent = "₹0.00";
+                alert("Please enter valid rate and weight!");
+                return;
+            }
+
+            const price = (rate / 1000) * grams;
+            document.getElementById("weightTotal").textContent = `₹${price.toFixed(2)}`;
+        }
+
+        function calculateWeight() {
+            const rate = parseFloat(document.getElementById("rate").value);
+            const amount = parseFloat(document.getElementById("amount").value);
+
+            if (isNaN(rate) || isNaN(amount) || rate <= 0 || amount <= 0) {
+                document.getElementById("result").innerText = "Please enter valid numbers.";
+                return;
+            }
+
+            const weightInKg = amount / rate;
+            const weightInGrams = weightInKg * 1000;
+
+            document.getElementById("result").innerText =
+                `You will get approx ${weightInGrams.toFixed(0)} grams.`;
+        }
+
+        // Clean up scanner when page unloads
+        window.addEventListener('beforeunload', function() {
+            stopBarcodeScanner();
+        });
+    </script>
+</body>
+</html>
